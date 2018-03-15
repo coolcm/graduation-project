@@ -4,7 +4,7 @@
     android:id="@+id/toolbar"
     app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
     app:contentInsetStartWithNavigation="0dp"
-    app:layout_scrollFlags="scroll|enterAlways"
+    app:layout_scrollFlags="scroll|enterAlways|snap"
     android:layout_width="match_parent"
     android:background="?attr/colorPrimary"
     android:layout_height="?android:attr/actionBarSize" />
