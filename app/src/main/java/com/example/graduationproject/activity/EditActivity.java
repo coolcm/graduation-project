@@ -1,52 +1,48 @@
 package com.example.graduationproject.activity;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.graduationproject.R;
 import com.example.graduationproject.bean.ListItemBean;
 
-import jp.wasabeef.richeditor.RichEditor;
-
 public class EditActivity extends AppCompatActivity {
 
-    RichEditor richEditor;
+    EditText editText;
     ListItemBean listItemBean = new ListItemBean();
     FloatingActionButton floatingActionButton;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("新建");
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
         floatingActionButton = findViewById(R.id.floating_ok_button);
+        editText = findViewById(R.id.edit_text);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (TextUtils.isEmpty(listItemBean.getContent())) {
+                if (TextUtils.isEmpty(String.valueOf(editText.getText()))) {
                     Toast.makeText(EditActivity.this, "发送内容不能为空~", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                listItemBean = new ListItemBean(String.valueOf(editText.getText()));
                 Intent intent = new Intent(EditActivity.this, ListActivity.class);
                 intent.putExtra("listItemBean", listItemBean);
                 setResult(1, intent);
                 finish();
-            }
-        });
-        richEditor = findViewById(R.id.rich_editor);
-        richEditor.setEditorHeight(200);
-        richEditor.setEditorFontSize(15);
-        richEditor.setPadding(10, 10, 10, 10);
-        richEditor.setPlaceholder("说说有什么新鲜事吧~");
-        richEditor.setOnTextChangeListener(new RichEditor.OnTextChangeListener() {
-            @Override
-            public void onTextChange(String text) {
-                listItemBean.setContent(text);
             }
         });
     }
@@ -56,5 +52,18 @@ public class EditActivity extends AppCompatActivity {
         Intent intent = new Intent(EditActivity.this, ListActivity.class);
         setResult(0, intent);
         finish();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                Intent intent = new Intent(EditActivity.this, ListActivity.class);
+                setResult(0, intent);
+                finish();
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
