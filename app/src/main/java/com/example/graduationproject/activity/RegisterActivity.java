@@ -43,6 +43,7 @@ public class RegisterActivity extends AppCompatActivity {
                     UserInfoBean userInfo = new UserInfoBean();
                     userInfo.setUserName(name);
                     userInfo.setUserPassword(password);
+                    userInfo.setCredit(100);
                     if (MyCache.isCacheExist(RegisterActivity.this, "user")) {
                         Toast.makeText(RegisterActivity.this, "用户注册失败,一个终端只能注册一个账号", Toast.LENGTH_SHORT).show();
                     } else {

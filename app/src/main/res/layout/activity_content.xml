@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -10,17 +11,117 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            android:layout_margin="8dp"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/content_user_image"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:src="@drawable/profile_photo_boy"
+                app:civ_border_width="2dp"
+                app:civ_border_color="#8800FFFF"/>
+
+            <TextView
+                android:id="@+id/content_user_name"
+                android:layout_marginTop="16dp"
+                android:layout_marginLeft="8dp"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:textColor="#FF333333"
+                android:gravity="center"
+                android:layout_toRightOf="@id/content_user_image"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp" />
+
+            <TextView
+                android:id="@+id/content_user_credit_text"
+                android:text="信用值："
+                android:layout_marginLeft="8dp"
+                android:layout_below="@id/content_user_name"
+                android:layout_toRightOf="@id/content_user_image"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp" />
+
+            <TextView
+                android:id="@+id/content_user_credit"
+                android:layout_below="@id/content_user_name"
+                android:layout_toRightOf="@id/content_user_credit_text"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="25dp" />
+
             <TextView
                 android:id="@+id/content_text_view"
-                android:textSize="15sp"
+                android:textSize="16sp"
+                android:padding="16dp"
+                android:background="@android:color/white"
+                android:lineSpacingExtra="3dp"
+                android:layout_below="@id/content_user_image"
+                android:layout_marginTop="16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-        </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_below="@id/content_text_view"
+                android:layout_alignParentRight="true"
+                android:paddingTop="8dp"
+                android:paddingRight="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/agree_button"
+                    android:background="@drawable/selector_agree_btn"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp" />
+
+                <TextView
+                    android:text="0"
+                    android:gravity="center"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:id="@+id/content_num_of_agree"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" />
+
+                <Button
+                    android:id="@+id/disagree_button"
+                    android:background="@drawable/selector_disagree_btn"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp" />
+
+                <TextView
+                    android:text="0"
+                    android:gravity="center"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:id="@+id/content_num_of_disagree"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" />
+
+                <Button
+                    android:id="@+id/comment_button"
+                    android:background="@drawable/selector_comment_btn"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp" />
+
+                <TextView
+                    android:text="0"
+                    android:gravity="center"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
+                    android:id="@+id/content_num_of_comment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+        </RelativeLayout>
 
     </ScrollView>
 </LinearLayout>

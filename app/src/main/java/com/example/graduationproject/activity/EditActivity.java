@@ -14,6 +14,8 @@ import android.widget.Toast;
 
 import com.example.graduationproject.R;
 import com.example.graduationproject.bean.ListItemBean;
+import com.example.graduationproject.bean.UserInfoBean;
+import com.example.graduationproject.utils.MyCache;
 
 public class EditActivity extends AppCompatActivity {
 
@@ -38,7 +40,11 @@ public class EditActivity extends AppCompatActivity {
                     Toast.makeText(EditActivity.this, "发送内容不能为空~", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                listItemBean = new ListItemBean(String.valueOf(editText.getText()));
+                UserInfoBean userInfo = (UserInfoBean) MyCache.getCache(EditActivity.this, "user");
+                if (userInfo == null) {
+                    return;
+                }
+                listItemBean = new ListItemBean(String.valueOf(editText.getText()), userInfo.getUserName(), userInfo.getCredit());
                 Intent intent = new Intent(EditActivity.this, ListActivity.class);
                 intent.putExtra("listItemBean", listItemBean);
                 setResult(1, intent);

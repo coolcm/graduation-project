@@ -42,12 +42,12 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         holder.userImageView.setImageResource(R.drawable.profile_photo_boy);
-        holder.userIdView.setText("sjtucsn");
-        holder.userCreditView.setText(String.valueOf(new Random().nextInt(100)));
+        holder.userIdView.setText(list.get(position).getUserName());
+        holder.userCreditView.setText(String.valueOf(list.get(position).getUserCredit()));
         holder.textView.setText(list.get(position).getContent());
-        holder.agreeView.setText(String.valueOf(new Random().nextInt(100)));
-        holder.disagreeView.setText(String.valueOf(new Random().nextInt(100)));
-        holder.commentView.setText(String.valueOf(new Random().nextInt(100)));
+        holder.agreeView.setText(String.valueOf(list.get(position).getItemAgree()));
+        holder.disagreeView.setText(String.valueOf(list.get(position).getItemDisagree()));
+        holder.commentView.setText(String.valueOf(list.get(position).getItemComment()));
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -77,7 +77,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
             super(itemView);
             cardView = itemView.findViewById(R.id.card_view);
             userImageView = itemView.findViewById(R.id.user_image);
-            userIdView = itemView.findViewById(R.id.user_id);
+            userIdView = itemView.findViewById(R.id.user_name);
             userCreditView = itemView.findViewById(R.id.user_credit);
             textView = itemView.findViewById(R.id.text_view);
             agreeView = itemView.findViewById(R.id.num_of_agree);

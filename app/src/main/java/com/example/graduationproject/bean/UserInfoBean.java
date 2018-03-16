@@ -11,6 +11,15 @@ public class UserInfoBean implements Serializable{
     private String userName;
     private String userPassword;
     private String userId;
+    private int credit;
+
+    public int getCredit() {
+        return credit;
+    }
+
+    public void setCredit(int credit) {
+        this.credit = credit;
+    }
 
     public String getUserName() {
         return userName;
