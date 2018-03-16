@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Graduation Project</string>
+    <string name="new_login"><u>新用户注册</u></string>
 </resources>
