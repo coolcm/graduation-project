@@ -81,7 +81,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
             userCreditView = itemView.findViewById(R.id.user_credit);
             textView = itemView.findViewById(R.id.text_view);
             agreeView = itemView.findViewById(R.id.num_of_agree);
-            disagreeView = itemView.findViewById(R.id.num_of_disagreee);
+            disagreeView = itemView.findViewById(R.id.num_of_disagree);
             commentView = itemView.findViewById(R.id.num_of_comment);
         }
     }
