@@ -9,7 +9,7 @@ import com.example.graduationproject.R;
 
 import java.util.Random;
 
-public class UserActivity extends AppCompatActivity {
+public class UserActivity extends AppCompatActivity {  //用户个人信息界面
 
     private TextView agreeView;
     private TextView disagreeView;

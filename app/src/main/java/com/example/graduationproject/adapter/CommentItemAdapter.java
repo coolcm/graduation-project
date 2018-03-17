@@ -17,7 +17,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by csn on 2018/3/17.
  */
 
-public class CommentItemAdapter extends RecyclerView.Adapter<CommentItemAdapter.ViewHolder> {
+public class CommentItemAdapter extends RecyclerView.Adapter<CommentItemAdapter.ViewHolder> { //评论内容适配器
     private List<CommentItemBean> list;
 
     public CommentItemAdapter(List<CommentItemBean> list) {

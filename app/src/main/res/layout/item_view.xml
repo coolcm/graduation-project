@@ -52,6 +52,7 @@
 
         </LinearLayout>
 
+        <!--android:ellipsize="end"设置多出的字用...表示 -->
         <TextView
             android:id="@+id/text_view"
             android:layout_marginTop="8dp"

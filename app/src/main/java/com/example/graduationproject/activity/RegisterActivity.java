@@ -12,7 +12,7 @@ import com.example.graduationproject.R;
 import com.example.graduationproject.bean.UserInfoBean;
 import com.example.graduationproject.utils.MyCache;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity { //注册界面
 
     EditText newUserView;
     EditText newPasswordView;

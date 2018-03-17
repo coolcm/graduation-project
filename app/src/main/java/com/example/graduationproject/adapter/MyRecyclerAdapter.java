@@ -22,7 +22,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by csn on 2018/3/14.
  */
 
-public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.ViewHolder> {
+public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.ViewHolder> { //每项文字资源内容适配器
 
     private List<ListItemBean> list;
     private Context context;
@@ -48,7 +48,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
         holder.agreeView.setText(String.valueOf(list.get(position).getItemAgree()));
         holder.disagreeView.setText(String.valueOf(list.get(position).getItemDisagree()));
         holder.commentView.setText(String.valueOf(list.get(position).getItemComment()));
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
+        holder.cardView.setOnClickListener(new View.OnClickListener() { //启动具体内容界面
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, ContentActivity.class);

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- focusable,focusableInTouchMode使界面打开时不会自动滑动到RecyclerView的底部，而会停留在界面最项部-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:focusableInTouchMode="true"
@@ -158,6 +159,7 @@
             android:scrollbars="vertical"
             android:layout_height="wrap_content" />
 
+        <!-- 加一个LinearLayout使Button能在底部居中显示-->
         <LinearLayout
             android:layout_gravity="bottom"
             android:paddingLeft="8dp"

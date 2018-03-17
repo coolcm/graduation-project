@@ -20,7 +20,7 @@ import com.example.graduationproject.bean.ListItemBean;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ListActivity extends AppCompatActivity {
+public class ListActivity extends AppCompatActivity { //主界面，对每段资源的内容进行列表显示
 
     NestedScrollView nestedScrollView;
     RecyclerView recyclerView;
@@ -71,12 +71,12 @@ public class ListActivity extends AppCompatActivity {
         list.add(new ListItemBean("最近一直在思考怎么样快速掌握一门编程语言基础，究竟哪些是入门编程语言的最少必要知识。\n" +
                 "\n" +
                 "在重新学习了python, javascript之后，我发现掌握基础编程概念后，使用如下套路可快速入门新的编程语言"));
-        myRecyclerAdapter = new MyRecyclerAdapter(list, this);
+        myRecyclerAdapter = new MyRecyclerAdapter(list, this); //每项的内容适配器
         linearLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(linearLayoutManager);;
         recyclerView.setAdapter(myRecyclerAdapter);
-        recyclerView.setNestedScrollingEnabled(false);
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+        recyclerView.setNestedScrollingEnabled(false); //禁止嵌套滑动，防止NestedScrollView和RecyclerView滑动冲突不流畅
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {  //启动新增文字资源信息界面
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(ListActivity.this, EditActivity.class);
@@ -91,8 +91,7 @@ public class ListActivity extends AppCompatActivity {
         switch (resultCode) {
             case 0: break;
             case 1:
-                list.add(0, (ListItemBean) data.getSerializableExtra("listItemBean"));
-                Log.e("123123", String.valueOf(list.size()));
+                list.add(0, (ListItemBean) data.getSerializableExtra("listItemBean")); //加入新增的文字信息
                 myRecyclerAdapter.notifyDataSetChanged();
                 nestedScrollView.scrollTo(0, 0);
                 break;
@@ -113,7 +112,7 @@ public class ListActivity extends AppCompatActivity {
             case android.R.id.home:
                 finish();
                 break;
-            case R.id.my_info:
+            case R.id.my_info: //启动个人信息界面
                 Intent intent = new Intent(this, UserActivity.class);
                 startActivity(intent);
                 break;

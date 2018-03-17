@@ -1,6 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?> 
-<shape 
-    xmlns:android="http://schemas.android.com/apk/res/android" 
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 非点击状态下的按钮样式-->
+<shape
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <solid android:color="#FF0088FF" />
     <corners android:radius="5dip" /> 

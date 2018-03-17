@@ -10,6 +10,7 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <!-- toolbar的弹出菜单界面的样式 -->
     <style name="ToolbarPopupTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:colorBackground">@color/colorPrimary</item>
         <item name="actionOverflowMenuStyle">@style/OverflowMenuStyle</item>

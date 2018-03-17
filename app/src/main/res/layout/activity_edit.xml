@@ -16,6 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
+            <!--background设置输入框下滑线的样式，textCursorDrawable设置输入框光标样式，默认为colorAccent的颜色 -->
             <EditText
                 android:id="@+id/edit_text"
                 android:gravity="top"
@@ -24,6 +25,7 @@
                 android:textCursorDrawable="@null"
                 android:padding="5dp"
                 android:textSize="15sp"
+                android:scrollbars="vertical"
                 android:hint="说说有什么新鲜事吧~"
                 android:layout_width="match_parent"
                 android:layout_height="200dp" />
@@ -35,8 +37,6 @@
             android:layout_gravity="right|bottom"
             android:layout_marginRight="15dp"
             android:layout_marginBottom="20dp"
-            android:clickable="true"
-            android:focusable="true"
             app:elevation="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

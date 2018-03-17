@@ -17,7 +17,7 @@ import com.example.graduationproject.bean.ListItemBean;
 import com.example.graduationproject.bean.UserInfoBean;
 import com.example.graduationproject.utils.MyCache;
 
-public class EditActivity extends AppCompatActivity {
+public class EditActivity extends AppCompatActivity { //编辑想发送的内容的界面
 
     EditText editText;
     ListItemBean listItemBean = new ListItemBean();
@@ -47,7 +47,7 @@ public class EditActivity extends AppCompatActivity {
                 listItemBean = new ListItemBean(String.valueOf(editText.getText()), userInfo.getUserName(), userInfo.getCredit());
                 Intent intent = new Intent(EditActivity.this, ListActivity.class);
                 intent.putExtra("listItemBean", listItemBean);
-                setResult(1, intent);
+                setResult(1, intent); //返回发送的文字内容信息给上一个activity
                 finish();
             }
         });

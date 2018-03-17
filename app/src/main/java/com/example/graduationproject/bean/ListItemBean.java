@@ -7,19 +7,19 @@ import java.util.Random;
  * Created by csn on 2018/3/14.
  */
 
-public class ListItemBean implements Serializable {
-    private String content;
-    private String userName;
-    private int userCredit;
-    private int itemAgree;
-    private int itemDisagree;
-    private int itemComment;
+public class ListItemBean implements Serializable { //每项文字资源信息
+    private String content; //文字内容
+    private String userName; //发送者用户名
+    private int userCredit; //发送者信用
+    private int itemAgree; //赞同数
+    private int itemDisagree; //反对数
+    private int itemComment; //评论数
 
     public ListItemBean() {
 
     }
 
-    public ListItemBean(String content) {
+    public ListItemBean(String content) { //测试使用，除主要文字内容外各项数据均随机生成
         this.content = content;
         this.userName = "test" + new Random().nextInt(100);
         this.userCredit = new Random().nextInt(100);
@@ -28,7 +28,7 @@ public class ListItemBean implements Serializable {
         this.itemComment = new Random().nextInt(100);
     }
 
-    public ListItemBean(String content, String userName, int userCredit) {
+    public ListItemBean(String content, String userName, int userCredit) { //新建文字资源信息，赞同，反对，评论数一开始均为0
         this.content = content;
         this.userName = userName;
         this.userCredit = userCredit;

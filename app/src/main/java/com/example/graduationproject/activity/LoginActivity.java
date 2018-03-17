@@ -15,7 +15,7 @@ import com.example.graduationproject.R;
 import com.example.graduationproject.bean.UserInfoBean;
 import com.example.graduationproject.utils.MyCache;
 
-public class LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity { //登录界面
 
     Button loginButton;
     EditText userNameView;
@@ -42,7 +42,7 @@ public class LoginActivity extends AppCompatActivity {
                 String name = String.valueOf(userNameView.getText());
                 String password = String.valueOf(userPasswordView.getText());
                 UserInfoBean userInfo = (UserInfoBean) MyCache.getCache(LoginActivity.this, "user");
-                if (userInfo != null && name.equals(userInfo.getUserName()) && password.equals(userInfo.getUserPassword())) {
+                if (userInfo != null && name.equals(userInfo.getUserName()) && password.equals(userInfo.getUserPassword())) { //通过缓存的信息验证用户名与密码
                     Intent intent = new Intent(LoginActivity.this, ListActivity.class);
                     startActivity(intent);
                     finish();
@@ -51,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
-        newLoginView.setOnClickListener(new View.OnClickListener() {
+        newLoginView.setOnClickListener(new View.OnClickListener() { //启动注册界面
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
@@ -65,8 +65,7 @@ public class LoginActivity extends AppCompatActivity {
         UserInfoBean userInfo = (UserInfoBean) MyCache.getCache(LoginActivity.this, "user");
         if (userInfo != null) {
             userNameView.setText(userInfo.getUserName());
-            userPasswordView.setText(userInfo.getUserPassword());
-            Log.e(userInfo.getUserName(), userInfo.getUserPassword());
+            userPasswordView.setText(userInfo.getUserPassword()); //根据缓存信息自动填写用户名和密码
         }
         super.onResume();
     }

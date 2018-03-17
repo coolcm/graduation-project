@@ -30,7 +30,7 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class ContentActivity extends AppCompatActivity implements View.OnClickListener{
+public class ContentActivity extends AppCompatActivity implements View.OnClickListener{ //具体内容界面
 
     List<CommentItemBean> list = new ArrayList<>();
     CommentItemAdapter commentItemAdapter;
@@ -79,7 +79,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         commentButton.setOnClickListener(this);
         sendCommentButton.setOnClickListener(this);
         Intent intent = getIntent();
-        listItem = (ListItemBean) intent.getSerializableExtra("content");
+        listItem = (ListItemBean) intent.getSerializableExtra("content"); //获取开启本活动的意图携带的信息
         if (listItem != null) {
             textView.setText(listItem.getContent());
             userNameView.setText(listItem.getUserName());
@@ -89,10 +89,10 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
             commentView.setText(String.valueOf(listItem.getItemComment()));
         }
         linearLayoutManager = new LinearLayoutManager(this);
-        commentItemAdapter = new CommentItemAdapter(list);
+        commentItemAdapter = new CommentItemAdapter(list); //评论界面适配器
         commentRecyclerView.setLayoutManager(linearLayoutManager);
         commentRecyclerView.setAdapter(commentItemAdapter);
-        sendCommentButton.setActivated(false);
+        sendCommentButton.setActivated(false); //评论发送按钮先设置inactivated
         commentEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -101,7 +101,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (TextUtils.isEmpty(charSequence.toString())) {
+                if (TextUtils.isEmpty(charSequence.toString())) { //监听评论框内容变化，决定是否activate评论发送按钮
                     sendCommentButton.setActivated(false);
                 } else {
                     sendCommentButton.setActivated(true);
@@ -131,7 +131,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         Button button;
         InputMethodManager inputMethodManager;
         switch (view.getId()) {
-            case R.id.agree_button:
+            case R.id.agree_button: //处理点赞按钮逻辑
                 button = (Button) view;
                 if (button.isActivated()) {
                     button.setActivated(false);
@@ -141,7 +141,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
                     agreeView.setText(String.valueOf(Integer.valueOf(agreeView.getText().toString()) + 1));
                 }
                 break;
-            case R.id.disagree_button:
+            case R.id.disagree_button: //处理点踩按钮逻辑
                 button = (Button) view;
                 if (button.isActivated()) {
                     button.setActivated(false);
@@ -151,14 +151,14 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
                     disagreeView.setText(String.valueOf(Integer.valueOf(disagreeView.getText().toString()) + 1));
                 }
                 break;
-            case R.id.comment_button:
-                commentEditText.requestFocus();
+            case R.id.comment_button: //处理评论按钮逻辑
+                commentEditText.requestFocus(); //评论框获取焦点
                 inputMethodManager = (InputMethodManager)this.getSystemService(Context.INPUT_METHOD_SERVICE);
                 if (inputMethodManager != null) {
-                    inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
+                    inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS); //反转输入法界面
                 }
                 break;
-            case R.id.send_comment_button:
+            case R.id.send_comment_button: //处理评论发送按钮逻辑
                 button = (Button) view;
                 if (!button.isActivated()) {
                     break;
@@ -169,14 +169,13 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
                     CommentItemBean commentItem = new CommentItemBean(content, userInfo.getUserName(), userInfo.getCredit(), listItem.getUserName());
                     list.add(commentItem);
                     commentItemAdapter.notifyItemInserted(list.size() - 1);
-                    linearLayoutManager.scrollToPositionWithOffset(list.size() - 1, 0);
                     commentEditText.setText(null);
-                    commentEditText.clearFocus();
+                    commentEditText.clearFocus(); //发送完毕，清空输入界面，并取消焦点
                     inputMethodManager = (InputMethodManager)this.getSystemService(Context.INPUT_METHOD_SERVICE);
-                    if (inputMethodManager != null) {
+                    if (inputMethodManager != null) { //关闭输入法界面
                         inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                     }
-                    scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+                    scrollView.fullScroll(ScrollView.FOCUS_DOWN); //控制scrollView滑动到底部最新评论处
                 }
         }
     }

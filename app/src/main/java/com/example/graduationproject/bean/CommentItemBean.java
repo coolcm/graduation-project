@@ -7,12 +7,12 @@ import java.util.Date;
  * Created by csn on 2018/3/17.
  */
 
-public class CommentItemBean implements Serializable{
-    private String content;
-    private String commentatorName;
-    private int commentatorCredit;
-    private Date commentTime;
-    private String userName;
+public class CommentItemBean implements Serializable{ //每条评论相关信息
+    private String content; //评论内容
+    private String commentatorName; //评论者名称
+    private int commentatorCredit; //评论者信用
+    private Date commentTime; //评论时间
+    private String userName; //被评论者名称
 
     public CommentItemBean(String content, String commentatorName, int commentatorCredit, String userName) {
         this.content = content;
