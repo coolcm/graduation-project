@@ -16,6 +16,9 @@ import android.view.View;
 import com.example.graduationproject.R;
 import com.example.graduationproject.adapter.MyRecyclerAdapter;
 import com.example.graduationproject.bean.ListItemBean;
+import com.example.graduationproject.interfaces.OnReceiveItemListener;
+import com.example.graduationproject.utils.AppUtils;
+import com.example.graduationproject.utils.Client;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +31,19 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
     LinearLayoutManager linearLayoutManager;
     FloatingActionButton floatingActionButton;
     List<ListItemBean> list = new ArrayList<>();
+    Client client = new Client("10.162.189.143", 1234, new OnReceiveItemListener() {
+        @Override
+        public void onReceiveItem(final Object object) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    ListItemBean listItem = (ListItemBean) object;
+                    list.add(0, listItem);
+                    myRecyclerAdapter.notifyDataSetChanged();
+                }
+            });
+        }
+    });
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,20 +95,38 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
         floatingActionButton.setOnClickListener(new View.OnClickListener() {  //启动新增文字资源信息界面
             @Override
             public void onClick(View view) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        client.getPeerAddress();
+                    }
+                }).start();
                 Intent intent = new Intent(ListActivity.this, EditActivity.class);
                 startActivityForResult(intent, 0);
             }
         });
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                client.getLocalAddress();
+            }
+        }).start();
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (resultCode) {
             case 0: break;
             case 1:
                 list.add(0, (ListItemBean) data.getSerializableExtra("listItemBean")); //加入新增的文字信息
                 myRecyclerAdapter.notifyDataSetChanged();
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        client.sendMessage(AppUtils.object2Bytes(data.getSerializableExtra("listItemBean")));
+                    }
+                }).start();
                 nestedScrollView.scrollTo(0, 0);
                 break;
             default:

@@ -39,6 +39,7 @@
 
     <TextView
         android:id="@+id/comment_content"
+        android:textColor="#FF333333"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:layout_toRightOf="@+id/commentator_image"
