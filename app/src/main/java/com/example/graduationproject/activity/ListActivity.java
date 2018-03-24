@@ -19,6 +19,7 @@ import com.example.graduationproject.bean.ListItemBean;
 import com.example.graduationproject.interfaces.OnReceiveItemListener;
 import com.example.graduationproject.utils.AppUtils;
 import com.example.graduationproject.utils.Client;
+import com.example.graduationproject.utils.WifiDirect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,26 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
     LinearLayoutManager linearLayoutManager;
     FloatingActionButton floatingActionButton;
     List<ListItemBean> list = new ArrayList<>();
-    Client client = new Client("10.162.189.143", 1234, new OnReceiveItemListener() {
+    WifiDirect wifiDirect;
+    OnReceiveItemListener onReceiveItemListener = new OnReceiveItemListener() {
+        @Override
+        public void onReceiveItem(Object object) {
+            ListItemBean listItem = null;
+            if (object instanceof ListItemBean) {
+                listItem = (ListItemBean) object;
+            }
+            list.add(0, listItem);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    myRecyclerAdapter.notifyDataSetChanged();
+                }
+            });
+            wifiDirect.unRegisterReceiver();
+            wifiDirect = WifiDirect.newInstance(ListActivity.this, onReceiveItemListener);
+        }
+    };
+    /*Client client = new Client("10.162.189.143", 1234, new OnReceiveItemListener() {
         @Override
         public void onReceiveItem(final Object object) {
             runOnUiThread(new Runnable() {
@@ -43,7 +63,7 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
                 }
             });
         }
-    });
+    });*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,22 +115,31 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
         floatingActionButton.setOnClickListener(new View.OnClickListener() {  //启动新增文字资源信息界面
             @Override
             public void onClick(View view) {
-                new Thread(new Runnable() {
+                /*new Thread(new Runnable() {
                     @Override
                     public void run() {
                         client.getPeerAddress();
                     }
-                }).start();
+                }).start();*/
                 Intent intent = new Intent(ListActivity.this, EditActivity.class);
                 startActivityForResult(intent, 0);
             }
         });
-        new Thread(new Runnable() {
+        wifiDirect = WifiDirect.newInstance(this, onReceiveItemListener);
+        /*new Thread(new Runnable() {
             @Override
             public void run() {
                 client.getLocalAddress();
             }
-        }).start();
+        }).start();*/
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (wifiDirect != null) {
+            wifiDirect.unRegisterReceiver();
+        }
     }
 
     @Override
@@ -124,7 +153,9 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        client.sendMessage(AppUtils.object2Bytes(data.getSerializableExtra("listItemBean")));
+                        /*client.sendMessage(AppUtils.object2Bytes(data.getSerializableExtra("listItemBean")));*/
+                        wifiDirect.setListItem((ListItemBean) data.getSerializableExtra("listItemBean"));
+                        wifiDirect.connect();
                     }
                 }).start();
                 nestedScrollView.scrollTo(0, 0);

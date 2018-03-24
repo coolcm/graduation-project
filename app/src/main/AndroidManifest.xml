@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.graduationproject">
 
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -23,6 +25,10 @@
         </activity>
         <activity android:name=".activity.RegisterActivity" />
         <activity android:name=".activity.UserActivity" />
+        <receiver
+            android:name=".broadcast.WifiDirectBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>
