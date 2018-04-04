@@ -2,6 +2,7 @@ package com.example.graduationproject.utils;
 
 import android.util.Log;
 
+import com.example.graduationproject.bean.ListItemBean;
 import com.example.graduationproject.interfaces.OnReceiveItemListener;
 
 import java.io.IOException;
@@ -15,6 +16,8 @@ import java.net.*;
 public class Client {
     private String serverIP;
     private int serverPort;
+    private String clientIP;
+    private String clientPort;
     private Map<String,String> map = new HashMap<>();
     private DatagramPacket datagramPacket;
     private DatagramSocket datagramSocket;
@@ -24,22 +27,31 @@ public class Client {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         this.onReceiveItemListener = onReceiveItemListener;
+        try {
+            datagramSocket = new DatagramSocket(30000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void getLocalAddress() {
+        if (clientIP != null && clientPort != null ) {
+            return;
+        }
         try {
             socketAddress = new InetSocketAddress(serverIP, serverPort);
-            datagramSocket = new DatagramSocket();
-            String str = "getIp";
-            byte buff[] = str.getBytes();
+            byte buff[] = ("login:" + getLocalHostLANAddress().getHostAddress() + ":" + datagramSocket.getLocalPort()).getBytes();
             byte buffer[] = new byte[8 * 1024];
             datagramPacket = new DatagramPacket(buff, 0, buff.length, socketAddress);
             datagramSocket.send(datagramPacket);//发送信息到服务器
+            System.out.println("findPeers");
             datagramPacket.setData(buffer, 0, buffer.length);
-            System.out.println(datagramPacket);
             datagramSocket.receive(datagramPacket);
             String message = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
-            System.out.println("本机端口、IP" + message);
+            String str[] = message.split(",");
+            clientIP = str[0];
+            clientPort = str[1];
+            System.out.println("本机地址" + message);
             new Thread(new UdpReceiveThread(datagramSocket)).start();
         } catch (Exception e) {
             e.printStackTrace();
@@ -48,9 +60,22 @@ public class Client {
 
     public void getPeerAddress() {
         try {
-            byte[] buff = "aa".getBytes();
+            byte[] buff = "findPeers".getBytes();
             socketAddress = new InetSocketAddress(serverIP, serverPort);
             datagramPacket = new DatagramPacket(buff, 0, buff.length, socketAddress);
+            datagramSocket.send(datagramPacket);
+            System.out.println("findPeers");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendLogoutMessage() {
+        try {
+            byte[] buff = "logout".getBytes();
+            socketAddress = new InetSocketAddress(serverIP, serverPort);
+            datagramPacket = new DatagramPacket(buff, 0, buff.length, socketAddress);
+            Log.e("sendLogoutMessage: ", "我下线啦");
             datagramSocket.send(datagramPacket);
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,7 +87,15 @@ public class Client {
         Log.e("sendMessage: ", String.valueOf(set.size()));
         for (String key: set) {
             String value = map.get(key);
-            socketAddress = new InetSocketAddress(value, Integer.parseInt(key));
+            System.out.println(key);
+            System.out.println(clientIP);
+            if (key.split(":")[0].equals(clientIP)) {
+                socketAddress = new InetSocketAddress(value.split(":")[0], Integer.parseInt(value.split(":")[1]));
+                System.out.println("use local address");
+            } else {
+                socketAddress = new InetSocketAddress(key.split(":")[0], Integer.parseInt(key.split(":")[1]));
+                System.out.println("use client address");
+            }
             datagramPacket = new DatagramPacket(message, 0, message.length, socketAddress);
             try {
                 datagramSocket.send(datagramPacket);
@@ -88,15 +121,19 @@ public class Client {
                 {
                     System.out.println("准备接收");
                     datagramSocket.receive(datagramPacket);
-                    String message = new String(datagramPacket.getData(),0,datagramPacket.getLength());
-                    if (message.startsWith("udp")) {
-                        String port=message.split(",")[1];
-                        String ip=message.split(",")[2];
-                        map.put(port, ip);
-                        System.out.println("目标端口、IP:"+port+","+ip);
+                    Object object = AppUtils.bytes2Object(datagramPacket.getData());
+                    if (object instanceof HashMap) {
+                        map.clear();
+                        map.putAll((HashMap<String, String>) object);
+                        for (String address: map.keySet()) {
+                            System.out.println("外网地址" + address + "," + "内网地址" + map.get(address));
+                        }
+                    } else if (object instanceof ListItemBean) {
+                        onReceiveItemListener.onReceiveItem(object);
+                        System.out.println("接收到" + object);
                     } else {
-                        System.out.println("接收到"+message);
-                        onReceiveItemListener.onReceiveItem(AppUtils.bytes2Object(datagramPacket.getData()));
+                        String message = new String(datagramPacket.getData(),0,datagramPacket.getLength());
+                        System.out.println("接收到"+ message);
                         if (message.equals("exit")) {
                             break;
                         }
@@ -104,11 +141,41 @@ public class Client {
                     buffer = new byte[1024];
                     datagramPacket.setData(buffer,0, buffer.length);
                 }
-            }
-            catch(Exception e)
-            {
+            } catch(Exception e) {
                 e.printStackTrace();
+            } finally {
+                datagramSocket.close();
             }
         }
+    }
+
+    private InetAddress getLocalHostLANAddress() throws Exception {
+        try {
+            InetAddress candidateAddress = null;
+            // 遍历所有的网络接口
+            for (Enumeration ifaces = NetworkInterface.getNetworkInterfaces(); ifaces.hasMoreElements(); ) {
+                NetworkInterface iface = (NetworkInterface) ifaces.nextElement();
+                // 在所有的接口下再遍历IP
+                for (Enumeration inetAddrs = iface.getInetAddresses(); inetAddrs.hasMoreElements(); ) {
+                    InetAddress inetAddr = (InetAddress) inetAddrs.nextElement();
+                    if (!inetAddr.isLoopbackAddress()) {// 排除loopback类型地址
+                        if (inetAddr.isSiteLocalAddress()) {
+                            // 如果是site-local地址，就是它了
+                            return inetAddr;
+                        } else if (candidateAddress == null) {
+                            // site-local类型的地址未被发现，先记录候选地址
+                            candidateAddress = inetAddr;
+                        }
+                    }
+                }
+            }
+            if (candidateAddress != null) {
+                return candidateAddress;
+            }
+            // 如果没有发现 non-loopback地址.只能用最次选的方案
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return InetAddress.getLocalHost();
     }
 }

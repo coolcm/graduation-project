@@ -1,5 +1,7 @@
 package com.example.graduationproject.bean;
 
+import org.litepal.crud.DataSupport;
+
 import java.io.Serializable;
 import java.util.Random;
 
@@ -7,7 +9,7 @@ import java.util.Random;
  * Created by csn on 2018/3/14.
  */
 
-public class ListItemBean implements Serializable { //每项文字资源信息
+public class ListItemBean extends DataSupport implements Serializable { //每项文字资源信息
     private String content; //文字内容
     private String userName; //发送者用户名
     private int userCredit; //发送者信用
