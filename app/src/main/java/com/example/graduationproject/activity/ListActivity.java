@@ -17,6 +17,7 @@ import android.view.View;
 
 import com.example.graduationproject.R;
 import com.example.graduationproject.adapter.MyRecyclerAdapter;
+import com.example.graduationproject.bean.CommentItemBean;
 import com.example.graduationproject.bean.ListItemBean;
 import com.example.graduationproject.interfaces.OnReceiveItemListener;
 import com.example.graduationproject.utils.AppUtils;
@@ -47,6 +48,10 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             ListItemBean listItem = null;
             if (object instanceof ListItemBean) {
                 listItem = (ListItemBean) object;
+            } else if (object instanceof CommentItemBean) {
+                CommentItemBean commentItem = (CommentItemBean) object;
+                commentItem.save();
+                Log.e("onReceiveItem: ", commentItem.toString());
             }
             if (listItem != null) {
                 list.add(0, listItem);
@@ -62,7 +67,7 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             //wifiDirect = WifiDirect.newInstance(ListActivity.this, onReceiveItemListener);
         }
     };
-    Client client = new Client("59.78.15.78", 1234, onReceiveItemListener);
+    Client client = Client.getInstance();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,6 +126,7 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             }
         });
         //wifiDirect = WifiDirect.newInstance(this, onReceiveItemListener);
+        client.setOnReceiveItemListener(onReceiveItemListener);
         runnable = new Runnable() {
             @Override
             public void run() {
@@ -145,6 +151,7 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             @Override
             public void run() {
                 client.sendLogoutMessage();
+                Client.closeClient(); //防止再次开启应用时该client尚未被释放
             }
         }).start();
         /*if (wifiDirect != null) {
@@ -162,6 +169,7 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
                     @Override
                     public void run() {
                         ListItemBean listItem = (ListItemBean) data.getSerializableExtra("listItemBean");
+                        Log.e("run: ", String.valueOf(listItem.getHash()));
                         client.sendMessage(AppUtils.object2Bytes(listItem));
                         //wifiDirect.setListItem(listItem);
                         //wifiDirect.connect();

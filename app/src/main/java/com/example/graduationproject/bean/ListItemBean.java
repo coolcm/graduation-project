@@ -1,8 +1,11 @@
 package com.example.graduationproject.bean;
 
+import com.example.graduationproject.utils.AppUtils;
+
 import org.litepal.crud.DataSupport;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Random;
 
 /**
@@ -16,6 +19,8 @@ public class ListItemBean extends DataSupport implements Serializable { //每项
     private int itemAgree; //赞同数
     private int itemDisagree; //反对数
     private int itemComment; //评论数
+    private Date sendTime;
+    private String hash;
 
     public ListItemBean() {
 
@@ -28,6 +33,8 @@ public class ListItemBean extends DataSupport implements Serializable { //每项
         this.itemAgree = new Random().nextInt(100);
         this.itemDisagree = new Random().nextInt(100);
         this.itemComment = new Random().nextInt(100);
+        this.sendTime = new Date();
+        this.hash = AppUtils.getSHA256Str(userName + content + sendTime.getTime());
     }
 
     public ListItemBean(String content, String userName, int userCredit) { //新建文字资源信息，赞同，反对，评论数一开始均为0
@@ -37,6 +44,20 @@ public class ListItemBean extends DataSupport implements Serializable { //每项
         this.itemAgree = 0;
         this.itemDisagree = 0;
         this.itemComment = 0;
+        this.sendTime = new Date();
+        this.hash = AppUtils.getSHA256Str(userName + content + sendTime.getTime());
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public Date getSendTime() {
+        return sendTime;
+    }
+
+    public void setSendTime(Date sendTime) {
+        this.sendTime = sendTime;
     }
 
     public int getUserCredit() {

@@ -9,7 +9,9 @@ import android.widget.TextView;
 import com.example.graduationproject.R;
 import com.example.graduationproject.bean.CommentItemBean;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -35,6 +37,7 @@ public class CommentItemAdapter extends RecyclerView.Adapter<CommentItemAdapter.
         holder.nameView.setText(list.get(position).getCommentatorName());
         holder.creditView.setText(String.valueOf(list.get(position).getCommentatorCredit()));
         holder.contentView.setText(list.get(position).getContent());
+        holder.commentTimeView.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA).format(list.get(position).getCommentTime()));
     }
 
     @Override
@@ -47,6 +50,7 @@ public class CommentItemAdapter extends RecyclerView.Adapter<CommentItemAdapter.
         TextView nameView;
         TextView creditView;
         TextView contentView;
+        TextView commentTimeView;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -54,6 +58,7 @@ public class CommentItemAdapter extends RecyclerView.Adapter<CommentItemAdapter.
             nameView = itemView.findViewById(R.id.commentator_name);
             creditView = itemView.findViewById(R.id.commentator_credit);
             contentView = itemView.findViewById(R.id.comment_content);
+            commentTimeView = itemView.findViewById(R.id.comment_time);
         }
     }
 }

@@ -20,7 +20,7 @@
         android:id="@+id/commentator_name"
         android:layout_toRightOf="@id/commentator_image"
         android:textColor="@android:color/black"
-        android:layout_marginRight="16dp"
+        android:layout_marginRight="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
@@ -35,6 +35,15 @@
         android:id="@+id/commentator_credit"
         android:layout_toRightOf="@id/credit_text"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:id="@+id/comment_time"
+        android:layout_toRightOf="@id/commentator_credit"
+        android:textSize="12sp"
+        android:gravity="center|end"
+        android:textColor="#FF555555"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <TextView

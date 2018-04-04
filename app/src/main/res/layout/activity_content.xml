@@ -45,20 +45,29 @@
             <TextView
                 android:id="@+id/content_user_credit_text"
                 android:text="信用值："
+                android:layout_marginTop="16dp"
                 android:layout_marginLeft="8dp"
-                android:layout_below="@id/content_user_name"
-                android:layout_toRightOf="@id/content_user_image"
+                android:layout_toRightOf="@id/content_user_name"
                 android:gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="25dp" />
 
             <TextView
                 android:id="@+id/content_user_credit"
-                android:layout_below="@id/content_user_name"
+                android:layout_marginTop="16dp"
                 android:layout_toRightOf="@id/content_user_credit_text"
                 android:gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="25dp" />
+
+            <TextView
+                android:id="@+id/content_time"
+                android:layout_below="@id/content_user_credit_text"
+                android:layout_marginTop="8dp"
+                android:layout_marginLeft="8dp"
+                android:layout_toRightOf="@id/content_user_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/content_text_view"

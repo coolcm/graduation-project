@@ -2,6 +2,7 @@ package com.example.graduationproject.utils;
 
 import android.util.Log;
 
+import com.example.graduationproject.bean.CommentItemBean;
 import com.example.graduationproject.bean.ListItemBean;
 import com.example.graduationproject.interfaces.OnReceiveItemListener;
 
@@ -23,10 +24,27 @@ public class Client {
     private DatagramSocket datagramSocket;
     private SocketAddress socketAddress;
     private OnReceiveItemListener onReceiveItemListener;
-    public Client (String serverIP, int serverPort, OnReceiveItemListener onReceiveItemListener) {
+
+    public void setOnReceiveItemListener(OnReceiveItemListener onReceiveItemListener) {
+        this.onReceiveItemListener = onReceiveItemListener;
+    }
+
+    private static Client client;
+
+    public static Client getInstance() {
+        if (client == null) {
+            client = new Client("10.162.240.227", 1234);
+        }
+        return client;
+    }
+
+    public static void closeClient() {
+        client = null;
+    }
+
+    public Client (String serverIP, int serverPort) {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
-        this.onReceiveItemListener = onReceiveItemListener;
         try {
             datagramSocket = new DatagramSocket(30000);
         } catch (Exception e) {
@@ -128,7 +146,7 @@ public class Client {
                         for (String address: map.keySet()) {
                             System.out.println("外网地址" + address + "," + "内网地址" + map.get(address));
                         }
-                    } else if (object instanceof ListItemBean) {
+                    } else if (object instanceof ListItemBean || object instanceof CommentItemBean) {
                         onReceiveItemListener.onReceiveItem(object);
                         System.out.println("接收到" + object);
                     } else {

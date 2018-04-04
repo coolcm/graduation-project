@@ -33,6 +33,7 @@
     -->
     <list>
         <mapping class="com.example.graduationproject.bean.ListItemBean" />
+        <mapping class="com.example.graduationproject.bean.CommentItemBean" />
     </list>
 
     <!--

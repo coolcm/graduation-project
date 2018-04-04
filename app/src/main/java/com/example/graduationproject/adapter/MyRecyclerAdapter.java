@@ -13,8 +13,10 @@ import com.example.graduationproject.R;
 import com.example.graduationproject.activity.ContentActivity;
 import com.example.graduationproject.bean.ListItemBean;
 
+
+import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Random;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -48,6 +50,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
         holder.agreeView.setText(String.valueOf(list.get(position).getItemAgree()));
         holder.disagreeView.setText(String.valueOf(list.get(position).getItemDisagree()));
         holder.commentView.setText(String.valueOf(list.get(position).getItemComment()));
+        holder.timeView.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA).format(list.get(position).getSendTime()));
         holder.cardView.setOnClickListener(new View.OnClickListener() { //启动具体内容界面
             @Override
             public void onClick(View view) {
@@ -72,6 +75,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
         private TextView agreeView;
         private TextView disagreeView;
         private TextView commentView;
+        private TextView timeView;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -83,6 +87,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
             agreeView = itemView.findViewById(R.id.num_of_agree);
             disagreeView = itemView.findViewById(R.id.num_of_disagree);
             commentView = itemView.findViewById(R.id.num_of_comment);
+            timeView = itemView.findViewById(R.id.send_time);
         }
     }
 }

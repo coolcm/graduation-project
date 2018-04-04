@@ -23,10 +23,16 @@ import com.example.graduationproject.adapter.CommentItemAdapter;
 import com.example.graduationproject.bean.CommentItemBean;
 import com.example.graduationproject.bean.ListItemBean;
 import com.example.graduationproject.bean.UserInfoBean;
+import com.example.graduationproject.utils.AppUtils;
+import com.example.graduationproject.utils.Client;
 import com.example.graduationproject.utils.MyCache;
 
+import org.litepal.crud.DataSupport;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -40,6 +46,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     CircleImageView userImageView;
     TextView userNameView;
     TextView userCreditView;
+    TextView contentTimeView;
     ListItemBean listItem;
     Button agreeButton;
     TextView agreeView;
@@ -50,6 +57,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     RecyclerView commentRecyclerView;
     EditText commentEditText;
     Button sendCommentButton;
+    Client client = Client.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +73,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         userNameView = findViewById(R.id.content_user_name);
         userCreditView = findViewById(R.id.content_user_credit);
         userImageView = findViewById(R.id.content_user_image);
+        contentTimeView = findViewById(R.id.content_time);
         agreeButton = findViewById(R.id.agree_button);
         disagreeButton = findViewById(R.id.disagree_button);
         commentButton = findViewById(R.id.comment_button);
@@ -84,10 +93,12 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
             textView.setText(listItem.getContent());
             userNameView.setText(listItem.getUserName());
             userCreditView.setText(String.valueOf(listItem.getUserCredit()));
+            contentTimeView.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA).format(listItem.getSendTime()));
             agreeView.setText(String.valueOf(listItem.getItemAgree()));
             disagreeView.setText(String.valueOf(listItem.getItemDisagree()));
             commentView.setText(String.valueOf(listItem.getItemComment()));
         }
+        list.addAll(0, DataSupport.where("resourceHash = ?", listItem.getHash()).order("id").find(CommentItemBean.class));
         linearLayoutManager = new LinearLayoutManager(this);
         commentItemAdapter = new CommentItemAdapter(list); //评论界面适配器
         commentRecyclerView.setLayoutManager(linearLayoutManager);
@@ -166,7 +177,13 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
                 String content = commentEditText.getText().toString();
                 UserInfoBean userInfo = (UserInfoBean) MyCache.getCache(this, "user");
                 if (userInfo != null) {
-                    CommentItemBean commentItem = new CommentItemBean(content, userInfo.getUserName(), userInfo.getCredit(), listItem.getUserName());
+                    final CommentItemBean commentItem = new CommentItemBean(content, userInfo.getUserName(), userInfo.getCredit(), listItem.getUserName(), listItem.getHash());
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            client.sendMessage(AppUtils.object2Bytes(commentItem));
+                        }
+                    }).start();
                     list.add(commentItem);
                     commentItemAdapter.notifyItemInserted(list.size() - 1);
                     commentEditText.setText(null);
