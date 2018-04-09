@@ -34,10 +34,10 @@
                 android:id="@+id/content_user_name"
                 android:layout_marginTop="16dp"
                 android:layout_marginLeft="8dp"
-                android:textStyle="bold"
                 android:textSize="20sp"
+                android:textStyle="bold"
                 android:textColor="#FF333333"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:layout_toRightOf="@id/content_user_image"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp" />
@@ -46,28 +46,28 @@
                 android:id="@+id/content_user_credit_text"
                 android:text="信用值："
                 android:layout_marginTop="16dp"
-                android:layout_marginLeft="8dp"
+                android:layout_marginLeft="16dp"
                 android:layout_toRightOf="@id/content_user_name"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="25dp" />
+                android:layout_height="30dp" />
 
             <TextView
                 android:id="@+id/content_user_credit"
                 android:layout_marginTop="16dp"
                 android:layout_toRightOf="@id/content_user_credit_text"
-                android:gravity="center"
+                android:gravity="center_vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="25dp" />
+                android:layout_height="30dp" />
 
             <TextView
                 android:id="@+id/content_time"
-                android:layout_below="@id/content_user_credit_text"
-                android:layout_marginTop="8dp"
+                android:layout_below="@id/content_user_name"
                 android:layout_marginLeft="8dp"
                 android:layout_toRightOf="@id/content_user_image"
+                android:gravity="center_vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="25dp" />
 
             <TextView
                 android:id="@+id/content_text_view"

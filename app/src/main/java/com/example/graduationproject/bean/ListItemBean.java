@@ -19,8 +19,8 @@ public class ListItemBean extends DataSupport implements Serializable { //每项
     private int itemAgree; //赞同数
     private int itemDisagree; //反对数
     private int itemComment; //评论数
-    private Date sendTime;
-    private String hash;
+    private Date sendTime; //文字发送时间
+    private String hash; //文字资源hash
 
     public ListItemBean() {
 
@@ -46,6 +46,16 @@ public class ListItemBean extends DataSupport implements Serializable { //每项
         this.itemComment = 0;
         this.sendTime = new Date();
         this.hash = AppUtils.getSHA256Str(userName + content + sendTime.getTime());
+    }
+
+    //在list中进行indexOf的比较时会调用equals方法，重写它用于判断相同的文字资源项(通过比较资源hash)
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ListItemBean) {
+            ListItemBean listItemBean = (ListItemBean) obj;
+            return hash.equals(listItemBean.getHash());
+        }
+        return super.equals(obj);
     }
 
     public String getHash() {

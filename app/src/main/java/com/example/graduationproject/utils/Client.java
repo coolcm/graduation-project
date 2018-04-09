@@ -2,7 +2,9 @@ package com.example.graduationproject.utils;
 
 import android.util.Log;
 
+import com.example.graduationproject.bean.AgreeItemBean;
 import com.example.graduationproject.bean.CommentItemBean;
+import com.example.graduationproject.bean.DisagreeItemBean;
 import com.example.graduationproject.bean.ListItemBean;
 import com.example.graduationproject.interfaces.OnReceiveItemListener;
 
@@ -62,7 +64,6 @@ public class Client {
             byte buffer[] = new byte[8 * 1024];
             datagramPacket = new DatagramPacket(buff, 0, buff.length, socketAddress);
             datagramSocket.send(datagramPacket);//发送信息到服务器
-            System.out.println("findPeers");
             datagramPacket.setData(buffer, 0, buffer.length);
             datagramSocket.receive(datagramPacket);
             String message = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
@@ -146,7 +147,7 @@ public class Client {
                         for (String address: map.keySet()) {
                             System.out.println("外网地址" + address + "," + "内网地址" + map.get(address));
                         }
-                    } else if (object instanceof ListItemBean || object instanceof CommentItemBean) {
+                    } else if (object instanceof ListItemBean || object instanceof CommentItemBean || object instanceof AgreeItemBean || object instanceof DisagreeItemBean) {
                         onReceiveItemListener.onReceiveItem(object);
                         System.out.println("接收到" + object);
                     } else {

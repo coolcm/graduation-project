@@ -15,7 +15,7 @@ public class CommentItemBean extends DataSupport implements Serializable{ //每�
     private int commentatorCredit; //评论者信用
     private Date commentTime; //评论时间
     private String userName; //被评论者名称
-    private String resourceHash;
+    private String resourceHash;  //被评论的资源hash
 
     public CommentItemBean(String content, String commentatorName, int commentatorCredit, String userName, String resourceHash) {
         this.content = content;

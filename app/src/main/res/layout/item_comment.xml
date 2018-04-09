@@ -19,6 +19,7 @@
     <TextView
         android:id="@+id/commentator_name"
         android:layout_toRightOf="@id/commentator_image"
+        android:textStyle="bold"
         android:textColor="@android:color/black"
         android:layout_marginRight="8dp"
         android:layout_width="wrap_content"

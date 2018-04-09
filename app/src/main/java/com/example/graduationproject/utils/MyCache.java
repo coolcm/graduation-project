@@ -1,6 +1,7 @@
 package com.example.graduationproject.utils;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -27,6 +28,34 @@ public class MyCache { //缓存相关数据信息
                 fileOutputStream = new FileOutputStream(file.getPath());
                 objectOutputStream = new ObjectOutputStream(fileOutputStream);
                 objectOutputStream.writeObject(object);
+                objectOutputStream.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (objectOutputStream != null) {
+                    try {
+                        objectOutputStream.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    public static void updateCache(Context context, String child, Serializable object) { //设置缓存信息
+        File file = new File(context.getCacheDir(), child + "/cache.txt");
+        if (file.exists()) {
+            Log.i("updateCache: ", "更新用户缓存信息");
+        }
+        if (file.getParentFile().exists() || file.getParentFile().mkdirs()) {
+            FileOutputStream fileOutputStream;
+            ObjectOutputStream objectOutputStream = null;
+            try {
+                fileOutputStream = new FileOutputStream(file.getPath());
+                objectOutputStream = new ObjectOutputStream(fileOutputStream);
+                objectOutputStream.writeObject(object);
+                objectOutputStream.flush();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

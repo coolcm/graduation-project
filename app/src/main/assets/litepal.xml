@@ -34,6 +34,8 @@
     <list>
         <mapping class="com.example.graduationproject.bean.ListItemBean" />
         <mapping class="com.example.graduationproject.bean.CommentItemBean" />
+        <mapping class="com.example.graduationproject.bean.AgreeItemBean" />
+        <mapping class="com.example.graduationproject.bean.DisagreeItemBean" />
     </list>
 
     <!--

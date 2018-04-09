@@ -17,10 +17,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.graduationproject.R;
 import com.example.graduationproject.adapter.CommentItemAdapter;
+import com.example.graduationproject.bean.AgreeItemBean;
 import com.example.graduationproject.bean.CommentItemBean;
+import com.example.graduationproject.bean.DisagreeItemBean;
 import com.example.graduationproject.bean.ListItemBean;
 import com.example.graduationproject.bean.UserInfoBean;
 import com.example.graduationproject.utils.AppUtils;
@@ -48,6 +51,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
     TextView userCreditView;
     TextView contentTimeView;
     ListItemBean listItem;
+    UserInfoBean userInfo;
     Button agreeButton;
     TextView agreeView;
     Button disagreeButton;
@@ -87,6 +91,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         disagreeButton.setOnClickListener(this);
         commentButton.setOnClickListener(this);
         sendCommentButton.setOnClickListener(this);
+        userInfo = (UserInfoBean) MyCache.getCache(this, "user");;
         Intent intent = getIntent();
         listItem = (ListItemBean) intent.getSerializableExtra("content"); //获取开启本活动的意图携带的信息
         if (listItem != null) {
@@ -103,6 +108,8 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         commentItemAdapter = new CommentItemAdapter(list); //评论界面适配器
         commentRecyclerView.setLayoutManager(linearLayoutManager);
         commentRecyclerView.setAdapter(commentItemAdapter);
+        agreeButton.setActivated(userInfo.containAgreeItem(listItem.getHash()));
+        disagreeButton.setActivated(userInfo.containDisAgreeItem(listItem.getHash()));
         sendCommentButton.setActivated(false); //评论发送按钮先设置inactivated
         commentEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -145,21 +152,51 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.agree_button: //处理点赞按钮逻辑
                 button = (Button) view;
                 if (button.isActivated()) {
-                    button.setActivated(false);
-                    agreeView.setText(String.valueOf(Integer.valueOf(agreeView.getText().toString()) - 1));
+                    Toast.makeText(this, "您已经点过赞啦，不能重复点赞哟~", Toast.LENGTH_SHORT).show();
                 } else {
                     button.setActivated(true);
                     agreeView.setText(String.valueOf(Integer.valueOf(agreeView.getText().toString()) + 1));
+                    if (userInfo != null) {
+                        final AgreeItemBean agreeItem = new AgreeItemBean(listItem.getHash(), listItem.getUserName(), userInfo.getUserName());
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                client.sendMessage(AppUtils.object2Bytes(agreeItem));
+                            }
+                        }).start();
+                        userInfo.addAgreeList(listItem.getHash()); //更新用户的点赞列表
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                MyCache.updateCache(ContentActivity.this, "user", userInfo);
+                            }
+                        }).start();
+                    }
                 }
                 break;
             case R.id.disagree_button: //处理点踩按钮逻辑
                 button = (Button) view;
                 if (button.isActivated()) {
-                    button.setActivated(false);
-                    disagreeView.setText(String.valueOf(Integer.valueOf(disagreeView.getText().toString()) - 1));
+                    Toast.makeText(this, "您已经踩过啦，没必要再踩一遍吧~", Toast.LENGTH_SHORT).show();
                 } else {
                     button.setActivated(true);
                     disagreeView.setText(String.valueOf(Integer.valueOf(disagreeView.getText().toString()) + 1));
+                    if (userInfo != null) {
+                        final DisagreeItemBean disagreeItem = new DisagreeItemBean(listItem.getHash(), listItem.getUserName(), userInfo.getUserName());
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                client.sendMessage(AppUtils.object2Bytes(disagreeItem));
+                            }
+                        }).start();
+                        userInfo.addDisagreeList(listItem.getHash()); //更新用户的点踩列表
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                MyCache.updateCache(ContentActivity.this, "user", userInfo);
+                            }
+                        }).start();
+                    }
                 }
                 break;
             case R.id.comment_button: //处理评论按钮逻辑
@@ -175,7 +212,6 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
                     break;
                 }
                 String content = commentEditText.getText().toString();
-                UserInfoBean userInfo = (UserInfoBean) MyCache.getCache(this, "user");
                 if (userInfo != null) {
                     final CommentItemBean commentItem = new CommentItemBean(content, userInfo.getUserName(), userInfo.getCredit(), listItem.getUserName(), listItem.getHash());
                     new Thread(new Runnable() {
@@ -193,6 +229,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
                         inputMethodManager.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS);
                     }
                     scrollView.fullScroll(ScrollView.FOCUS_DOWN); //控制scrollView滑动到底部最新评论处
+                    commentView.setText(String.valueOf(Integer.valueOf(commentView.getText().toString()) + 1));
                 }
         }
     }

@@ -42,7 +42,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.userImageView.setImageResource(R.drawable.profile_photo_boy);
         holder.userIdView.setText(list.get(position).getUserName());
         holder.userCreditView.setText(String.valueOf(list.get(position).getUserCredit()));
@@ -55,7 +55,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(context, ContentActivity.class);
-                intent.putExtra("content", list.get(position));
+                intent.putExtra("content", list.get(holder.getAdapterPosition())); //不用list.get(position)，处理点击项显示的和点击位置不一样的问题
                 context.startActivity(intent);
             }
         });
