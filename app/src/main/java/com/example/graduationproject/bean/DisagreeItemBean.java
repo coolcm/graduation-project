@@ -11,11 +11,13 @@ import java.io.Serializable;
 public class DisagreeItemBean extends DataSupport implements Serializable {
     private String resourceHash;  //被反对的资源hash
     private String userName; //被反对的用户名称
+    private int userCredit; //被反对的用户信用
     private String disagreeName; //反对名称
 
-    public DisagreeItemBean(String resourceHash, String userName, String disagreeName) {
+    public DisagreeItemBean(String resourceHash, String userName, int userCredit, String disagreeName) {
         this.resourceHash = resourceHash;
         this.userName = userName;
+        this.userCredit = userCredit;
         this.disagreeName = disagreeName;
     }
 
@@ -33,6 +35,14 @@ public class DisagreeItemBean extends DataSupport implements Serializable {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public int getUserCredit() {
+        return userCredit;
+    }
+
+    public void setUserCredit(int userCredit) {
+        this.userCredit = userCredit;
     }
 
     public String getDisagreeName() {

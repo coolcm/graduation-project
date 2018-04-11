@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.graduationproject.R;
+import com.example.graduationproject.bean.UserCreditBean;
 import com.example.graduationproject.bean.UserInfoBean;
 import com.example.graduationproject.utils.MyCache;
 
@@ -48,6 +49,7 @@ public class RegisterActivity extends AppCompatActivity { //注册界面
                         Toast.makeText(RegisterActivity.this, "用户注册失败,一个终端只能注册一个账号", Toast.LENGTH_SHORT).show();
                     } else {
                         MyCache.setCache(RegisterActivity.this, "user", userInfo);
+                        new UserCreditBean(name, 100).save();
                         Toast.makeText(RegisterActivity.this, "用户注册成功", Toast.LENGTH_SHORT).show();
                         finish();
                     }

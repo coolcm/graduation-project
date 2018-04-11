@@ -14,8 +14,11 @@ import android.widget.Toast;
 
 import com.example.graduationproject.R;
 import com.example.graduationproject.bean.ListItemBean;
+import com.example.graduationproject.bean.UserCreditBean;
 import com.example.graduationproject.bean.UserInfoBean;
 import com.example.graduationproject.utils.MyCache;
+
+import org.litepal.crud.DataSupport;
 
 public class EditActivity extends AppCompatActivity { //编辑想发送的内容的界面
 
@@ -44,7 +47,8 @@ public class EditActivity extends AppCompatActivity { //编辑想发送的内容
                 if (userInfo == null) {
                     return;
                 }
-                listItemBean = new ListItemBean(String.valueOf(editText.getText()), userInfo.getUserName(), userInfo.getCredit());
+                int credit = DataSupport.where("userName = ?", userInfo.getUserName()).findFirst(UserCreditBean.class).getUserCredit();
+                listItemBean = new ListItemBean(String.valueOf(editText.getText()), userInfo.getUserName(), credit);
                 Intent intent = new Intent(EditActivity.this, ListActivity.class);
                 intent.putExtra("listItemBean", listItemBean);
                 setResult(1, intent); //返回发送的文字内容信息给上一个activity

@@ -92,10 +92,13 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
                 });
             } else if (object instanceof AgreeItemBean) {
                 AgreeItemBean agreeItem = (AgreeItemBean) object;
-                if (userInfo.getUserName().equals(agreeItem.getUserName())) {
-                    userInfo.setCredit(userInfo.getCredit() + 1);
-                    MyCache.updateCache(ListActivity.this, "user", userInfo);
+                UserCreditBean userCredit = DataSupport.where("userName = ?", agreeItem.getUserName()).findFirst(UserCreditBean.class);
+                if (userCredit == null) {
+                    userCredit = new UserCreditBean(agreeItem.getUserName(), agreeItem.getUserCredit() + 1);
+                } else {
+                    userCredit.setUserCredit(userCredit.getUserCredit() + 1);
                 }
+                userCredit.save();
                 agreeItem.save();
                 listItemBean = DataSupport.where("hash = ?", agreeItem.getResourceHash()).findFirst(ListItemBean.class);
                 if (listItemBean != null) {
@@ -105,10 +108,13 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
                 }
             } else if (object instanceof DisagreeItemBean) {
                 DisagreeItemBean disagreeItem = (DisagreeItemBean) object;
-                if (userInfo.getUserName().equals(disagreeItem.getUserName())) {
-                    userInfo.setCredit(userInfo.getCredit() - 1);
-                    MyCache.updateCache(ListActivity.this, "user", userInfo);
+                UserCreditBean userCredit = DataSupport.where("userName = ?", disagreeItem.getUserName()).findFirst(UserCreditBean.class);
+                if (userCredit == null) {
+                    userCredit = new UserCreditBean(disagreeItem.getUserName(), disagreeItem.getUserCredit() - 1);
+                } else {
+                    userCredit.setUserCredit(userCredit.getUserCredit() - 1);
                 }
+                userCredit.save();
                 disagreeItem.save();
                 listItemBean = DataSupport.where("hash = ?", disagreeItem.getResourceHash()).findFirst(ListItemBean.class);
                 if (listItemBean != null) {
