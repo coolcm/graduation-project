@@ -8,6 +8,9 @@ import android.widget.TextView;
 
 import com.example.graduationproject.R;
 import com.example.graduationproject.bean.CommentItemBean;
+import com.example.graduationproject.bean.UserCreditBean;
+
+import org.litepal.crud.DataSupport;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -35,7 +38,7 @@ public class CommentItemAdapter extends RecyclerView.Adapter<CommentItemAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.nameView.setText(list.get(position).getCommentatorName());
-        holder.creditView.setText(String.valueOf(list.get(position).getCommentatorCredit()));
+        holder.creditView.setText(String.valueOf(DataSupport.where("userName = ?", list.get(position).getCommentatorName()).findFirst(UserCreditBean.class).getUserCredit()));
         holder.contentView.setText(list.get(position).getContent());
         holder.commentTimeView.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA).format(list.get(position).getCommentTime()));
     }

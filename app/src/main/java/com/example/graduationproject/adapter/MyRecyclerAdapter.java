@@ -12,7 +12,10 @@ import android.widget.TextView;
 import com.example.graduationproject.R;
 import com.example.graduationproject.activity.ContentActivity;
 import com.example.graduationproject.bean.ListItemBean;
+import com.example.graduationproject.bean.UserCreditBean;
 
+
+import org.litepal.crud.DataSupport;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -45,7 +48,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         holder.userImageView.setImageResource(R.drawable.profile_photo_boy);
         holder.userIdView.setText(list.get(position).getUserName());
-        holder.userCreditView.setText(String.valueOf(list.get(position).getUserCredit()));
+        holder.userCreditView.setText(String.valueOf(DataSupport.where("userName = ?", list.get(position).getUserName()).findFirst(UserCreditBean.class).getUserCredit()));
         holder.textView.setText(list.get(position).getContent());
         holder.agreeView.setText(String.valueOf(list.get(position).getItemAgree()));
         holder.disagreeView.setText(String.valueOf(list.get(position).getItemDisagree()));

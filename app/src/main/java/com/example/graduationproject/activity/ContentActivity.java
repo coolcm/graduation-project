@@ -103,7 +103,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
             disagreeView.setText(String.valueOf(listItem.getItemDisagree()));
             commentView.setText(String.valueOf(listItem.getItemComment()));
         }
-        list.addAll(0, DataSupport.where("resourceHash = ?", listItem.getHash()).order("id").find(CommentItemBean.class));
+        list.addAll(0, DataSupport.where("resourceHash = ?", listItem.getHash()).order("id").limit(10).find(CommentItemBean.class));
         linearLayoutManager = new LinearLayoutManager(this);
         commentItemAdapter = new CommentItemAdapter(list); //评论界面适配器
         commentRecyclerView.setLayoutManager(linearLayoutManager);

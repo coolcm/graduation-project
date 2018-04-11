@@ -21,10 +21,13 @@ import com.example.graduationproject.bean.AgreeItemBean;
 import com.example.graduationproject.bean.CommentItemBean;
 import com.example.graduationproject.bean.DisagreeItemBean;
 import com.example.graduationproject.bean.ListItemBean;
+import com.example.graduationproject.bean.UserCreditBean;
+import com.example.graduationproject.bean.UserInfoBean;
 import com.example.graduationproject.component.FixBugLinearLayoutManager;
 import com.example.graduationproject.interfaces.OnReceiveItemListener;
 import com.example.graduationproject.utils.AppUtils;
 import com.example.graduationproject.utils.Client;
+import com.example.graduationproject.utils.MyCache;
 import com.example.graduationproject.utils.WifiDirect;
 
 import org.litepal.LitePal;
@@ -45,50 +48,68 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
     Handler handler = new Handler();
     Runnable runnable;
     SQLiteDatabase db;
+    UserInfoBean userInfo;
     OnReceiveItemListener onReceiveItemListener = new OnReceiveItemListener() {
         @Override
         public void onReceiveItem(Object object) {
             ListItemBean listItem = null;
             int i = -1; //发生变化的信息项在list中的位置
-            List<ListItemBean> tempList; //存储数据库里查询到的发生变化的信息项列表
             ListItemBean listItemBean = null; //找到发生评论或点赞等变化的文字信息项
             if (object instanceof ListItemBean) {
                 listItem = (ListItemBean) object;
             } else if (object instanceof CommentItemBean) {
                 CommentItemBean commentItem = (CommentItemBean) object;
                 commentItem.save();
-                tempList = DataSupport.where("hash = ?", commentItem.getResourceHash()).find(ListItemBean.class);
-                if (tempList.size() > 0) {
-                    listItemBean = tempList.get(0); //获取评论或点赞信息更新的文字资源项
-                    if (listItemBean != null) {
-                        i = list.indexOf(listItemBean);
-                        listItemBean.setItemComment(listItemBean.getItemComment() + 1);
-                        listItemBean.save();
+                listItemBean = DataSupport.where("hash = ?", commentItem.getResourceHash()).findFirst(ListItemBean.class);
+                if (listItemBean != null) {
+                    i = list.indexOf(listItemBean);
+                    listItemBean.setItemComment(listItemBean.getItemComment() + 1);
+                    listItemBean.save();
+                }
+                UserCreditBean userCredit = DataSupport.where("userName = ?", commentItem.getCommentatorName()).findFirst(UserCreditBean.class);
+                if (userCredit == null) {
+                    userCredit = new UserCreditBean(commentItem.getCommentatorName(), commentItem.getCommentatorCredit());
+                } else {
+                    userCredit.setUserCredit(commentItem.getCommentatorCredit());
+                }
+                userCredit.save();
+                for (ListItemBean lb : list) {
+                    if (lb.getUserName().equals(commentItem.getCommentatorName())) {
+                        lb.setUserCredit(commentItem.getCommentatorCredit());
                     }
                 }
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.e("run: ", "更新评论者数据");
+                        myRecyclerAdapter.notifyItemRangeChanged(0, list.size());
+                    }
+                });
             } else if (object instanceof AgreeItemBean) {
                 AgreeItemBean agreeItem = (AgreeItemBean) object;
+                if (userInfo.getUserName().equals(agreeItem.getUserName())) {
+                    userInfo.setCredit(userInfo.getCredit() + 1);
+                    MyCache.updateCache(ListActivity.this, "user", userInfo);
+                }
                 agreeItem.save();
-                tempList = DataSupport.where("hash = ?", agreeItem.getResourceHash()).find(ListItemBean.class);
-                if (tempList.size() > 0) {
-                    listItemBean = tempList.get(0);
-                    if (listItemBean != null) {
-                        i = list.indexOf(listItemBean);
-                        listItemBean.setItemAgree(listItemBean.getItemAgree() + 1);
-                        listItemBean.save();
-                    }
+                listItemBean = DataSupport.where("hash = ?", agreeItem.getResourceHash()).findFirst(ListItemBean.class);
+                if (listItemBean != null) {
+                    i = list.indexOf(listItemBean);
+                    listItemBean.setItemAgree(listItemBean.getItemAgree() + 1);
+                    listItemBean.save();
                 }
             } else if (object instanceof DisagreeItemBean) {
                 DisagreeItemBean disagreeItem = (DisagreeItemBean) object;
+                if (userInfo.getUserName().equals(disagreeItem.getUserName())) {
+                    userInfo.setCredit(userInfo.getCredit() - 1);
+                    MyCache.updateCache(ListActivity.this, "user", userInfo);
+                }
                 disagreeItem.save();
-                tempList = DataSupport.where("hash = ?", disagreeItem.getResourceHash()).find(ListItemBean.class);
-                if (tempList.size() > 0) {
-                    listItemBean = tempList.get(0);
-                    if (listItemBean != null) {
-                        i = list.indexOf(listItemBean);
-                        listItemBean.setItemDisagree(listItemBean.getItemDisagree() + 1);
-                        listItemBean.save();
-                    }
+                listItemBean = DataSupport.where("hash = ?", disagreeItem.getResourceHash()).findFirst(ListItemBean.class);
+                if (listItemBean != null) {
+                    i = list.indexOf(listItemBean);
+                    listItemBean.setItemDisagree(listItemBean.getItemDisagree() + 1);
+                    listItemBean.save();
                 }
             }
             if (i != -1) {
@@ -104,11 +125,21 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             }
             if (listItem != null) { //处理接收到文字资源项的情况
                 list.add(0, listItem);
+                UserCreditBean userCredit = DataSupport.where("userName = ?", listItem.getUserName()).findFirst(UserCreditBean.class);
+                if (userCredit == null) {
+                    userCredit = new UserCreditBean(listItem.getUserName(), listItem.getUserCredit());
+                } else {
+                    userCredit.setUserCredit(listItem.getUserCredit());
+                }
+                userCredit.save();
+                for (ListItemBean lb : list) {
+                    lb.setUserCredit(DataSupport.where("userName = ?", lb.getUserName()).findFirst(UserCreditBean.class).getUserCredit());
+                }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Log.e("run: ", "插入数据");
-                        myRecyclerAdapter.notifyItemInserted(0);
+                        myRecyclerAdapter.notifyItemRangeChanged(0, list.size());
                     }
                 });
                 listItem.save();
@@ -181,6 +212,7 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             }
         });
         //wifiDirect = WifiDirect.newInstance(this, onReceiveItemListener);
+        userInfo = (UserInfoBean) MyCache.getCache(this, "user");
         client.setOnReceiveItemListener(onReceiveItemListener);
         runnable = new Runnable() {
             @Override
