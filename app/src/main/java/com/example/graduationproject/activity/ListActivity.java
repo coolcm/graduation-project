@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.graduationproject.R;
 import com.example.graduationproject.adapter.MyRecyclerAdapter;
@@ -24,6 +26,7 @@ import com.example.graduationproject.bean.ListItemBean;
 import com.example.graduationproject.bean.UserCreditBean;
 import com.example.graduationproject.bean.UserInfoBean;
 import com.example.graduationproject.component.FixBugLinearLayoutManager;
+import com.example.graduationproject.component.MySwipeRefreshLayout;
 import com.example.graduationproject.interfaces.OnReceiveItemListener;
 import com.example.graduationproject.utils.AppUtils;
 import com.example.graduationproject.utils.Client;
@@ -39,11 +42,13 @@ import java.util.List;
 public class ListActivity extends AppCompatActivity { //主界面，对每段资源的内容进行列表显示
 
     NestedScrollView nestedScrollView;
+    MySwipeRefreshLayout mySwipeRefreshLayout;
     RecyclerView recyclerView;
     MyRecyclerAdapter myRecyclerAdapter;
     LinearLayoutManager linearLayoutManager;
     FloatingActionButton floatingActionButton;
     List<ListItemBean> list = new ArrayList<>();
+    private int startId = 0;
     WifiDirect wifiDirect;
     Handler handler = new Handler();
     Runnable runnable;
@@ -124,7 +129,10 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
                 });
             }
             if (listItem != null) { //处理接收到文字资源项的情况
-                list.add(0, listItem);
+                listItem.save();
+                startId = 0;
+                list.clear();
+                list.addAll(0, DataSupport.order("id desc").limit(10).find(ListItemBean.class));
                 UserCreditBean userCredit = DataSupport.where("userName = ?", listItem.getUserName()).findFirst(UserCreditBean.class);
                 if (userCredit == null) {
                     userCredit = new UserCreditBean(listItem.getUserName(), listItem.getUserCredit());
@@ -132,14 +140,12 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
                     userCredit.setUserCredit(listItem.getUserCredit());
                 }
                 userCredit.save();
-                for (ListItemBean lb : list) {
-                    lb.setUserCredit(DataSupport.where("userName = ?", lb.getUserName()).findFirst(UserCreditBean.class).getUserCredit());
-                }
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         Log.e("run: ", "插入数据");
                         myRecyclerAdapter.notifyItemRangeChanged(0, list.size());
+                        nestedScrollView.scrollTo(0, 0);
                     }
                 });
                 listItem.save();
@@ -159,6 +165,7 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         nestedScrollView = findViewById(R.id.scroll_view);
         recyclerView = findViewById(R.id.recycler_view);
+        mySwipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
         floatingActionButton = findViewById(R.id.floating_add_button);
         new Thread(new Runnable() {
             @Override
@@ -201,9 +208,58 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
         }).start();
         myRecyclerAdapter = new MyRecyclerAdapter(list, this); //每项的内容适配器
         linearLayoutManager = new FixBugLinearLayoutManager(this); //处理华为5.1手机RecyclerView遇到Inconsistency detected崩溃的情况
-        recyclerView.setLayoutManager(linearLayoutManager);;
+        recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(myRecyclerAdapter);
         recyclerView.setNestedScrollingEnabled(false); //禁止嵌套滑动，防止NestedScrollView和RecyclerView滑动冲突不流畅
+        mySwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                list.clear();
+                list.addAll(0, DataSupport.order("id desc").limit(10).find(ListItemBean.class));
+                startId = 0;
+                myRecyclerAdapter.notifyItemRangeChanged(0, list.size());
+                mySwipeRefreshLayout.setRefreshing(false);
+            }
+        });
+        mySwipeRefreshLayout.setOnLoadMoreListener(new MySwipeRefreshLayout.OnLoadMoreListener() {
+            @Override
+            public void onLoad() {
+                startId += 10;
+                mySwipeRefreshLayout.setProgressViewEndTarget(false, 900);
+                mySwipeRefreshLayout.setRefreshing(true);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (DataSupport.count(ListItemBean.class) > startId) {
+                            list.addAll(startId, DataSupport.order("id desc").offset(startId).limit(10).find(ListItemBean.class));
+                            handler.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    myRecyclerAdapter.notifyItemRangeChanged(startId, list.size() - startId);
+                                    mySwipeRefreshLayout.setRefreshing(false);
+                                    mySwipeRefreshLayout.setLoadingMore(false);
+                                    mySwipeRefreshLayout.setProgressViewEndTarget(false, (int) (64 * getResources().getDisplayMetrics().density));
+                                }
+                            }, 500);
+                        } else {
+                            mySwipeRefreshLayout.setRefreshing(false);
+                            mySwipeRefreshLayout.setLoadingMore(false);
+                            mySwipeRefreshLayout.setProgressViewEndTarget(false, (int) (64 * getResources().getDisplayMetrics().density));
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(ListActivity.this, "已经到底啦~", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    }
+                }).start();
+            }
+        });
+        mySwipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.translucent);
+        mySwipeRefreshLayout.setColorSchemeResources(android.R.color.holo_red_light,
+                android.R.color.holo_green_light,
+                android.R.color.holo_blue_light);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {  //启动新增文字资源信息界面
             @Override
             public void onClick(View view) {
@@ -262,7 +318,6 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
                         //wifiDirect.connect();
                     }
                 }).start();
-                nestedScrollView.scrollTo(0, 0);
                 break;
             default:
                 break;

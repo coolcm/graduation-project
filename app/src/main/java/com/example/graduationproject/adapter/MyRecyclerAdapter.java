@@ -46,6 +46,7 @@ public class MyRecyclerAdapter extends RecyclerView.Adapter<MyRecyclerAdapter.Vi
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
+        //Log.e("onBindViewHolder: ", String.valueOf(position)); 证明RecyclerView嵌套在NestedScrollView里时会一次性渲染全部的item
         holder.userImageView.setImageResource(R.drawable.profile_photo_boy);
         holder.userIdView.setText(list.get(position).getUserName());
         holder.userCreditView.setText(String.valueOf(DataSupport.where("userName = ?", list.get(position).getUserName()).findFirst(UserCreditBean.class).getUserCredit()));

@@ -1,5 +1,7 @@
 package com.example.graduationproject.bean;
 
+import android.util.Log;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +20,14 @@ public class UserInfoBean implements Serializable{ //用户个人信息
     private List<String> disagreeList = new ArrayList<>(); //反对的资源hash列表
 
     public void addAgreeList(String hash) {
+        Log.e("addAgreeList: ", hash);
         agreeList.add(hash);
+        Log.e("addAgreeList: ", agreeList.toString());
     }
 
     public boolean containAgreeItem(String hash) {
+        Log.e("containAgreeItem: ", hash);
+        Log.e("containAgreeItem: ", agreeList.toString());
         return agreeList.contains(hash);
     }
 
