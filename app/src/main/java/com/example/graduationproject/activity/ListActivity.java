@@ -20,6 +20,8 @@ import android.widget.Toast;
 import com.example.graduationproject.R;
 import com.example.graduationproject.adapter.MyRecyclerAdapter;
 import com.example.graduationproject.bean.AgreeItemBean;
+import com.example.graduationproject.bean.BlockBean;
+import com.example.graduationproject.bean.BlockChainBean;
 import com.example.graduationproject.bean.CommentItemBean;
 import com.example.graduationproject.bean.DisagreeItemBean;
 import com.example.graduationproject.bean.ListItemBean;
@@ -52,115 +54,45 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
     WifiDirect wifiDirect;
     Handler handler = new Handler();
     Runnable runnable;
+    Runnable blockChainRunnable;
     SQLiteDatabase db;
     UserInfoBean userInfo;
+    BlockBean blockBean = null; //收集接收到的各种文字，点赞，反对，评论信息，用于区块广播
     OnReceiveItemListener onReceiveItemListener = new OnReceiveItemListener() {
         @Override
         public void onReceiveItem(Object object) {
-            ListItemBean listItem = null;
-            int i = -1; //发生变化的信息项在list中的位置
-            ListItemBean listItemBean = null; //找到发生评论或点赞等变化的文字信息项
+            if (blockBean == null) {
+                blockBean = new BlockBean(DataSupport.findLast(BlockChainBean.class).getHash());
+            }
             if (object instanceof ListItemBean) {
-                listItem = (ListItemBean) object;
+                ListItemBean listItem = (ListItemBean) object;
+                blockBean.addResourceItem(listItem);
+                if (listItem.getUserName().equals(userInfo.getUserName())) { //即时更新自己发送的文字资源信息
+                    list.add(0, listItem);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.e("run: ", "插入数据");
+                            myRecyclerAdapter.notifyItemRangeChanged(0, list.size());
+                            nestedScrollView.scrollTo(0, 0);
+                        }
+                    });
+                }
             } else if (object instanceof CommentItemBean) {
-                CommentItemBean commentItem = (CommentItemBean) object;
-                commentItem.save();
-                listItemBean = DataSupport.where("hash = ?", commentItem.getResourceHash()).findFirst(ListItemBean.class);
-                if (listItemBean != null) {
-                    i = list.indexOf(listItemBean);
-                    listItemBean.setItemComment(listItemBean.getItemComment() + 1);
-                    listItemBean.save();
-                }
-                UserCreditBean userCredit = DataSupport.where("userName = ?", commentItem.getCommentatorName()).findFirst(UserCreditBean.class);
-                if (userCredit == null) {
-                    userCredit = new UserCreditBean(commentItem.getCommentatorName(), commentItem.getCommentatorCredit());
-                } else {
-                    userCredit.setUserCredit(commentItem.getCommentatorCredit());
-                }
-                userCredit.save();
-                for (ListItemBean lb : list) {
-                    if (lb.getUserName().equals(commentItem.getCommentatorName())) {
-                        lb.setUserCredit(commentItem.getCommentatorCredit());
-                    }
-                }
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.e("run: ", "更新评论者数据");
-                        myRecyclerAdapter.notifyItemRangeChanged(0, list.size());
-                    }
-                });
+                blockBean.addCommentItem((CommentItemBean) object);
             } else if (object instanceof AgreeItemBean) {
-                AgreeItemBean agreeItem = (AgreeItemBean) object;
-                UserCreditBean userCredit = DataSupport.where("userName = ?", agreeItem.getUserName()).findFirst(UserCreditBean.class);
-                if (userCredit == null) {
-                    userCredit = new UserCreditBean(agreeItem.getUserName(), agreeItem.getUserCredit() + 1);
-                } else {
-                    userCredit.setUserCredit(userCredit.getUserCredit() + 1);
-                }
-                userCredit.save();
-                agreeItem.save();
-                listItemBean = DataSupport.where("hash = ?", agreeItem.getResourceHash()).findFirst(ListItemBean.class);
-                if (listItemBean != null) {
-                    i = list.indexOf(listItemBean);
-                    listItemBean.setItemAgree(listItemBean.getItemAgree() + 1);
-                    listItemBean.save();
-                }
+                blockBean.addAgreeItem((AgreeItemBean) object);
             } else if (object instanceof DisagreeItemBean) {
-                DisagreeItemBean disagreeItem = (DisagreeItemBean) object;
-                UserCreditBean userCredit = DataSupport.where("userName = ?", disagreeItem.getUserName()).findFirst(UserCreditBean.class);
-                if (userCredit == null) {
-                    userCredit = new UserCreditBean(disagreeItem.getUserName(), disagreeItem.getUserCredit() - 1);
-                } else {
-                    userCredit.setUserCredit(userCredit.getUserCredit() - 1);
-                }
-                userCredit.save();
-                disagreeItem.save();
-                listItemBean = DataSupport.where("hash = ?", disagreeItem.getResourceHash()).findFirst(ListItemBean.class);
-                if (listItemBean != null) {
-                    i = list.indexOf(listItemBean);
-                    listItemBean.setItemDisagree(listItemBean.getItemDisagree() + 1);
-                    listItemBean.save();
-                }
-            }
-            if (i != -1) {
-                list.set(i, listItemBean); //找到界面上需要更新的文字资源项
-                final int j = i;
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.e("run: ", "更新数据");
-                        myRecyclerAdapter.notifyItemChanged(j);
-                    }
-                });
-            }
-            if (listItem != null) { //处理接收到文字资源项的情况
-                listItem.save();
-                startId = 0;
-                list.clear();
-                list.addAll(0, DataSupport.order("id desc").limit(10).find(ListItemBean.class));
-                UserCreditBean userCredit = DataSupport.where("userName = ?", listItem.getUserName()).findFirst(UserCreditBean.class);
-                if (userCredit == null) {
-                    userCredit = new UserCreditBean(listItem.getUserName(), listItem.getUserCredit());
-                } else {
-                    userCredit.setUserCredit(listItem.getUserCredit());
-                }
-                userCredit.save();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.e("run: ", "插入数据");
-                        myRecyclerAdapter.notifyItemRangeChanged(0, list.size());
-                        nestedScrollView.scrollTo(0, 0);
-                    }
-                });
-                listItem.save();
+                blockBean.addDisagreeItemBean((DisagreeItemBean) object);
+            } else if (object instanceof BlockBean) {
+                onReceiveBlockChainBean((BlockBean) object);
             }
             //wifiDirect.unRegisterReceiver();
             //wifiDirect = WifiDirect.newInstance(ListActivity.this, onReceiveItemListener);
         }
     };
     Client client = Client.getInstance();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,38 +109,6 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             @Override
             public void run() {
                 db = LitePal.getDatabase();
-                /*list.add(new ListItemBean("好好读几年书，高考去，考个正经学校。再嫌不系统就考出国去，考个斯坦福伯克利什么的，再系统不过了。\n" +
-                        "趁年轻，还有时间走正路，不要急着抄捷径。目前编程对你来说就当个爱好玩一玩挺好。"));
-                list.add(new ListItemBean("最近一直在思考怎么样快速掌握一门编程语言基础，究竟哪些是入门编程语言的最少必要知识。\n" +
-                        "\n" +
-                        "在重新学习了python, javascript之后，我发现掌握基础编程概念后，使用如下套路可快速入门新的编程语言"));
-                list.add(new ListItemBean("学英语\n" +
-                        "考托福\n" +
-                        "考 SAT\n" +
-                        "申请美国计算机前 50 的学校 / 加拿大前 10 的学校\n" +
-                        "好好听课\n" +
-                        "没了"));
-                list.add(new ListItemBean("到现在题主应该还没进入大学吧。没有基础？当然啦，谁一开始都是没有基础的。初中时候，家里没电脑，学校里上微机课我就写QB。当然内容也不是什么高大上的，比如写个剪刀石头布啦、模拟一下游戏里5-20的攻击力是怎么弄出来的、自己再捣鼓一个加幸运的算法进去。高中时期比较忙，泛泛地了解了一下C，只停留在能打印个菱形的水平。\n" +
-                        "\n" +
-                        "作者：[已重置]\n" +
-                        "链接：https://www.zhihu.com/question/28611887/answer/141188181\n" +
-                        "来源：知乎\n" +
-                        "著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"));
-                list.add(new ListItemBean("不管做什么事情，兴趣是最重要的，没有兴趣是坚持不下去的。\n" +
-                        "根据自己的兴趣，选择适合自己的学习路径，掌握一定的学习方法。\n" +
-                        "最后，坚持+坚持+坚持。"));
-                list.add(new ListItemBean("到现在题主应该还没进入大学吧。没有基础？当然啦，谁一开始都是没有基础的。初中时候，家里没电脑，学校里上微机课我就写QB。当然内容也不是什么高大上的，比如写个剪刀石头布啦、模拟一下游戏里5-20的攻击力是怎么弄出来的、自己再捣鼓一个加幸运的算法进去。高中时期比较忙，泛泛地了解了一下C，只停留在能打印个菱形的水平。\n" +
-                        "\n" +
-                        "著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"));
-                list.add(new ListItemBean("学英语\n" +
-                        "考托福\n" +
-                        "考 SAT\n" +
-                        "申请美国计算机前 50 的学校 / 加拿大前 10 的学校\n" +
-                        "好好听课\n" +
-                        "没了"));
-                list.add(new ListItemBean("最近一直在思考怎么样快速掌握一门编程语言基础，究竟哪些是入门编程语言的最少必要知识。\n" +
-                        "\n" +
-                        "在重新学习了python, javascript之后，我发现掌握基础编程概念后，使用如下套路可快速入门新的编程语言"));*/
                 list.addAll(0, DataSupport.order("id desc").limit(10).find(ListItemBean.class));
             }
         }).start();
@@ -290,6 +190,24 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             }
         };
         handler.postDelayed(runnable, 2000);
+        blockChainRunnable = new Runnable() {
+            @Override
+            public void run() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (blockBean != null && userInfo.getUserName().equals("admin")) { //暂定只有管理员可广播区块
+                            Log.e("run: ", "广播区块");
+                            blockBean.save();
+                            client.sendMessage(AppUtils.object2Bytes(blockBean));
+                            blockBean = null;
+                        }
+                    }
+                }).start();
+                handler.postDelayed(this, 10000);
+            }
+        };
+        handler.postDelayed(blockChainRunnable, 10000); //10秒更新一次区块信息
     }
 
     @Override
@@ -350,5 +268,76 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    //解析区块信息
+    private void onReceiveBlockChainBean(BlockBean blockBean) {
+        Log.e("onReceiveBlock: ", blockBean.getPrevHash());
+        if (DataSupport.where("prevHash = ?", blockBean.getPrevHash()).findFirst(BlockChainBean.class) != null) {
+            Log.e("onReceiveBlockChain", "存在了");
+            return;
+        }
+        BlockChainBean blockChainBean = new BlockChainBean(blockBean.getTimeStamp(), blockBean.getPrevHash(), blockBean.getHash(), AppUtils.object2Bytes(blockBean));
+        blockChainBean.save();
+        List<ListItemBean> resourceList = blockBean.getResourceList();
+        List<CommentItemBean> commentList = blockBean.getCommentList();
+        List<AgreeItemBean> agreeList = blockBean.getAgreeList();
+        List<DisagreeItemBean> disagreeList = blockBean.getDisagreeList();
+        for (ListItemBean listItem: resourceList) {
+            listItem.save();
+            UserCreditBean userCredit = DataSupport.where("userName = ?", listItem.getUserName()).findFirst(UserCreditBean.class);
+            if (userCredit == null) {
+                userCredit = new UserCreditBean(listItem.getUserName(), listItem.getUserCredit());
+            } else {
+                userCredit.setUserCredit(listItem.getUserCredit());
+            }
+            userCredit.save();
+        }
+        for (CommentItemBean commentItem: commentList) {
+            commentItem.save();
+            ListItemBean listItemBean = DataSupport.where("hash = ?", commentItem.getResourceHash()).findFirst(ListItemBean.class);
+            if (listItemBean != null) {
+                listItemBean.setItemComment(listItemBean.getItemComment() + 1);
+                listItemBean.save();
+            }
+            UserCreditBean userCredit = DataSupport.where("userName = ?", commentItem.getCommentatorName()).findFirst(UserCreditBean.class);
+            if (userCredit == null) {
+                userCredit = new UserCreditBean(commentItem.getCommentatorName(), commentItem.getCommentatorCredit());
+            } else {
+                userCredit.setUserCredit(commentItem.getCommentatorCredit());
+            }
+            userCredit.save();
+        }
+        for (AgreeItemBean agreeItem: agreeList) {
+            agreeItem.save();
+            UserCreditBean userCredit = DataSupport.where("userName = ?", agreeItem.getUserName()).findFirst(UserCreditBean.class);
+            if (userCredit == null) {
+                userCredit = new UserCreditBean(agreeItem.getUserName(), agreeItem.getUserCredit() + 1);
+            } else {
+                userCredit.setUserCredit(userCredit.getUserCredit() + 1);
+            }
+            userCredit.save();
+            ListItemBean listItemBean = DataSupport.where("hash = ?", agreeItem.getResourceHash()).findFirst(ListItemBean.class);
+            if (listItemBean != null) {
+                listItemBean.setItemAgree(listItemBean.getItemAgree() + 1);
+                listItemBean.save();
+            }
+        }
+        for (DisagreeItemBean disagreeItem: disagreeList) {
+            disagreeItem.save();
+            UserCreditBean userCredit = DataSupport.where("userName = ?", disagreeItem.getUserName()).findFirst(UserCreditBean.class);
+            if (userCredit == null) {
+                userCredit = new UserCreditBean(disagreeItem.getUserName(), disagreeItem.getUserCredit() - 1);
+            } else {
+                userCredit.setUserCredit(userCredit.getUserCredit() - 1);
+            }
+            userCredit.save();
+            ListItemBean listItemBean = DataSupport.where("hash = ?", disagreeItem.getResourceHash()).findFirst(ListItemBean.class);
+            if (listItemBean != null) {
+                listItemBean.setItemDisagree(listItemBean.getItemDisagree() + 1);
+                listItemBean.save();
+            }
+        }
+        this.blockBean = null; //接收后将区块置为空，防止区块重新发送
     }
 }

@@ -44,7 +44,7 @@ public class AppUtils {
         Object object = null;
         try {
             objectInputStream = new ObjectInputStream(byteArrayInputStream);
-            object =  objectInputStream.readObject();
+            object = objectInputStream.readObject();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

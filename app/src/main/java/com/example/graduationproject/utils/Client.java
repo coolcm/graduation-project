@@ -3,12 +3,12 @@ package com.example.graduationproject.utils;
 import android.util.Log;
 
 import com.example.graduationproject.bean.AgreeItemBean;
+import com.example.graduationproject.bean.BlockBean;
 import com.example.graduationproject.bean.CommentItemBean;
 import com.example.graduationproject.bean.DisagreeItemBean;
 import com.example.graduationproject.bean.ListItemBean;
 import com.example.graduationproject.interfaces.OnReceiveItemListener;
 
-import java.io.IOException;
 import java.util.*;
 import java.net.*;
 
@@ -103,6 +103,7 @@ public class Client {
 
     public void sendMessage(byte[] message) {
         Set<String> set = map.keySet();
+        int i = 0;
         Log.e("sendMessage: ", String.valueOf(set.size()));
         for (String key: set) {
             String value = map.get(key);
@@ -115,11 +116,18 @@ public class Client {
                 socketAddress = new InetSocketAddress(key.split(":")[0], Integer.parseInt(key.split(":")[1]));
                 System.out.println("use client address");
             }
-            datagramPacket = new DatagramPacket(message, 0, message.length, socketAddress);
+            //udp传输最多一次只能传1024字节，传输较大的区块结构时需要分段传输
             try {
+                for (i = 0; i * 1024 <= message.length - 1024; i++) {
+                    datagramPacket = new DatagramPacket(message, i * 1024, 1024, socketAddress);
+                    datagramSocket.send(datagramPacket);
+                    Thread.sleep(1);
+                }
+                datagramPacket = new DatagramPacket(message, i * 1024, message.length % 1024, socketAddress);
                 datagramSocket.send(datagramPacket);
+                Thread.sleep(1);
                 System.out.println("向" + value + ":" + key + "发送信息" + message.toString());
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -139,17 +147,26 @@ public class Client {
                 while (true)
                 {
                     System.out.println("准备接收");
-                    datagramSocket.receive(datagramPacket);
-                    Object object = AppUtils.bytes2Object(datagramPacket.getData());
+                    //udp传输最多一次只能传1024字节，接收较大的区块结构时需要分段接收
+                    StringBuilder str = new StringBuilder();
+                    while (true) {
+                        datagramSocket.receive(datagramPacket);
+                        String temp = new String(datagramPacket.getData(), "ISO-8859-1"); //该编码方式可防止字符串和比特数组之间转换结果不一致
+                        str.append(temp);
+                        if (datagramPacket.getLength() < 1024) { //接收到结尾时跳出
+                            break;
+                        }
+                    }
+                    Object object = AppUtils.bytes2Object(str.toString().getBytes("ISO-8859-1"));
                     if (object instanceof HashMap) {
                         map.clear();
                         map.putAll((HashMap<String, String>) object);
                         for (String address: map.keySet()) {
                             System.out.println("外网地址" + address + "," + "内网地址" + map.get(address));
                         }
-                    } else if (object instanceof ListItemBean || object instanceof CommentItemBean || object instanceof AgreeItemBean || object instanceof DisagreeItemBean) {
+                    } else if (object instanceof ListItemBean || object instanceof CommentItemBean ||
+                            object instanceof AgreeItemBean || object instanceof DisagreeItemBean || object instanceof BlockBean) {
                         onReceiveItemListener.onReceiveItem(object);
-                        System.out.println("接收到" + object);
                     } else {
                         String message = new String(datagramPacket.getData(),0,datagramPacket.getLength());
                         System.out.println("接收到"+ message);

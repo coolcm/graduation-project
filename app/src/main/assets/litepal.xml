@@ -37,6 +37,7 @@
         <mapping class="com.example.graduationproject.bean.AgreeItemBean" />
         <mapping class="com.example.graduationproject.bean.DisagreeItemBean" />
         <mapping class="com.example.graduationproject.bean.UserCreditBean" />
+        <mapping class="com.example.graduationproject.bean.BlockChainBean" />
     </list>
 
     <!--

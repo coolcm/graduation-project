@@ -9,8 +9,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.graduationproject.R;
+import com.example.graduationproject.bean.BlockBean;
+import com.example.graduationproject.bean.BlockChainBean;
 import com.example.graduationproject.bean.UserCreditBean;
 import com.example.graduationproject.bean.UserInfoBean;
+import com.example.graduationproject.utils.AppUtils;
 import com.example.graduationproject.utils.MyCache;
 
 public class RegisterActivity extends AppCompatActivity { //注册界面
@@ -53,6 +56,10 @@ public class RegisterActivity extends AppCompatActivity { //注册界面
                         Toast.makeText(RegisterActivity.this, "用户注册成功", Toast.LENGTH_SHORT).show();
                         finish();
                     }
+                    BlockBean blockBean = new BlockBean(AppUtils.getSHA256Str("创世区块")); //添加创世区块结构
+                    blockBean.save();
+                    BlockChainBean blockChainBean = new BlockChainBean(blockBean.getTimeStamp(), blockBean.getPrevHash(), blockBean.getHash(), AppUtils.object2Bytes(blockBean));
+                    blockChainBean.save();
                 } else {
                     Toast.makeText(RegisterActivity.this, "用户注册失败，请输入正确的用户名或密码", Toast.LENGTH_SHORT).show();
                 }
