@@ -4,11 +4,15 @@ import android.util.Log;
 
 import com.example.graduationproject.bean.AgreeItemBean;
 import com.example.graduationproject.bean.BlockBean;
+import com.example.graduationproject.bean.BlockChainBean;
 import com.example.graduationproject.bean.CommentItemBean;
 import com.example.graduationproject.bean.DisagreeItemBean;
 import com.example.graduationproject.bean.ListItemBean;
 import com.example.graduationproject.interfaces.OnReceiveItemListener;
 
+import org.litepal.crud.DataSupport;
+
+import java.io.IOException;
 import java.util.*;
 import java.net.*;
 
@@ -35,12 +39,13 @@ public class Client {
 
     public static Client getInstance() {
         if (client == null) {
-            client = new Client("59.78.15.78", 1234);
+            client = new Client("10.162.73.244", 1234);
         }
         return client;
     }
 
     public static void closeClient() {
+        Log.e("closeClient", "关闭udp连接");
         client = null;
     }
 
@@ -103,7 +108,7 @@ public class Client {
 
     public void sendMessage(byte[] message) {
         Set<String> set = map.keySet();
-        int i = 0;
+        int i;
         Log.e("sendMessage: ", String.valueOf(set.size()));
         for (String key: set) {
             String value = map.get(key);
@@ -126,10 +131,58 @@ public class Client {
                 datagramPacket = new DatagramPacket(message, i * 1024, message.length % 1024, socketAddress);
                 datagramSocket.send(datagramPacket);
                 Thread.sleep(1);
-                System.out.println("向" + value + ":" + key + "发送信息" + message.toString());
+                Log.e("向" + value + ":" + key + "发送信息", new String(message));
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    //发送区块同步请求信息，请求编号为id之后的所有区块
+    public void requestBlockChain(int id) {
+        Set<String> set = map.keySet();
+        for (String key: set) {
+            String value = map.get(key);
+            Log.e("requestBlockChain", "遍历到" + value + ":" + key);
+            if (key.split(":")[0].equals(clientIP) && key.split(":")[1].equals(clientPort)) {
+                continue; //如果是自己的地址，则向下一对地址发送请求
+            }
+            if (key.split(":")[0].equals(clientIP)) {
+                socketAddress = new InetSocketAddress(value.split(":")[0], Integer.parseInt(value.split(":")[1]));
+                System.out.println("use local address");
+            } else {
+                socketAddress = new InetSocketAddress(key.split(":")[0], Integer.parseInt(key.split(":")[1]));
+                System.out.println("use client address");
+            }
+            byte[] message = ("requestBlockChain:" + id).getBytes();
+            datagramPacket = new DatagramPacket(message, 0, message.length, socketAddress);
+            try {
+                datagramSocket.send(datagramPacket);
+                Log.e("向" + value + ":" + key + "发送请求区块信息", new String(message));
+                return; //只向一个综端发起区块同步请求
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    // 收到同步请求后发送本地区块信息
+    private void sendBlockChain(byte[] blockChainBytes, String tempIP, int tempPort) {
+        int i;
+        socketAddress = new InetSocketAddress(tempIP, tempPort);
+        //udp传输最多一次只能传1024字节，传输较大的区块结构时需要分段传输
+        try {
+            for (i = 0; i * 1024 <= blockChainBytes.length - 1024; i++) {
+                datagramPacket = new DatagramPacket(blockChainBytes, i * 1024, 1024, socketAddress);
+                datagramSocket.send(datagramPacket);
+                Thread.sleep(1);
+            }
+            datagramPacket = new DatagramPacket(blockChainBytes, i * 1024, blockChainBytes.length % 1024, socketAddress);
+            datagramSocket.send(datagramPacket);
+            Thread.sleep(1);
+            Log.e("向" + tempIP + ":" + tempPort + "发送信息", new String(blockChainBytes));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -169,9 +222,17 @@ public class Client {
                         onReceiveItemListener.onReceiveItem(object);
                     } else {
                         String message = new String(datagramPacket.getData(),0,datagramPacket.getLength());
-                        System.out.println("接收到"+ message);
+                        Log.e("接收到", message);
                         if (message.equals("exit")) {
                             break;
+                        } else if (message.startsWith("requestBlockChain")) { //处理区块同步请求
+                            int id = Integer.parseInt(message.split(":")[1]);
+                            onReceiveItemListener.onReceiveItem(id);
+                            List<BlockChainBean> blockChainBeanList = DataSupport.where("id > ?", String.valueOf(id)).find(BlockChainBean.class);
+                            InetSocketAddress inetSocketAddress = (InetSocketAddress) datagramPacket.getSocketAddress();;
+                            for (BlockChainBean blockChain: blockChainBeanList) {
+                                sendBlockChain(blockChain.getBlockBeanInfo(), inetSocketAddress.getAddress().getHostAddress(), inetSocketAddress.getPort());
+                            }
                         }
                     }
                     buffer = new byte[1024];

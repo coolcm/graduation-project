@@ -56,7 +56,7 @@ public class RegisterActivity extends AppCompatActivity { //注册界面
                         Toast.makeText(RegisterActivity.this, "用户注册成功", Toast.LENGTH_SHORT).show();
                         finish();
                     }
-                    BlockBean blockBean = new BlockBean(AppUtils.getSHA256Str("创世区块")); //添加创世区块结构
+                    BlockBean blockBean = new BlockBean(1, AppUtils.getSHA256Str("创世区块")); //添加创世区块结构
                     blockBean.save();
                     BlockChainBean blockChainBean = new BlockChainBean(blockBean.getTimeStamp(), blockBean.getPrevHash(), blockBean.getHash(), AppUtils.object2Bytes(blockBean));
                     blockChainBean.save();

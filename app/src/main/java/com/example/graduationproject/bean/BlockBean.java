@@ -12,6 +12,7 @@ import java.util.Date;
  */
 
 public class BlockBean implements Serializable {
+    private int id; //区块id号，提供广播的区块id信息
     private String prevHash; //前一区块哈希
     private String hash; //本区块哈希
     private long timeStamp; //时间戳
@@ -24,7 +25,8 @@ public class BlockBean implements Serializable {
     private int disagreeLength = 0;
     private ArrayList<DisagreeItemBean> disagreeList = new ArrayList<>(); //反对信息列表
 
-    public BlockBean(String prevHash) {
+    public BlockBean(int id, String prevHash) {
+        this.id = id;
         this.prevHash = prevHash;
     }
 
@@ -53,6 +55,14 @@ public class BlockBean implements Serializable {
     public void addDisagreeItemBean(DisagreeItemBean disagreeItemBean) {
         disagreeList.add(disagreeItemBean);
         disagreeLength ++;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getPrevHash() {

@@ -58,11 +58,13 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
     SQLiteDatabase db;
     UserInfoBean userInfo;
     BlockBean blockBean = null; //收集接收到的各种文字，点赞，反对，评论信息，用于区块广播
+    int currentId = 1; //记录当前主链最新区块id
     OnReceiveItemListener onReceiveItemListener = new OnReceiveItemListener() {
         @Override
         public void onReceiveItem(Object object) {
             if (blockBean == null) {
-                blockBean = new BlockBean(DataSupport.findLast(BlockChainBean.class).getHash());
+                BlockChainBean blockChain = DataSupport.findLast(BlockChainBean.class);
+                blockBean = new BlockBean(blockChain.getId(), blockChain.getHash());
             }
             if (object instanceof ListItemBean) {
                 ListItemBean listItem = (ListItemBean) object;
@@ -85,7 +87,20 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             } else if (object instanceof DisagreeItemBean) {
                 blockBean.addDisagreeItemBean((DisagreeItemBean) object);
             } else if (object instanceof BlockBean) {
-                onReceiveBlockChainBean((BlockBean) object);
+                BlockBean blockBean = (BlockBean) object;
+                onReceiveBlockChainBean(blockBean);
+                if (blockBean.getId() == currentId) { //同步区块完成后刷新页面，普通更新不会触发该逻辑
+                    list.clear();
+                    list.addAll(0, DataSupport.order("id desc").limit(10).find(ListItemBean.class));
+                    startId = 0;
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            myRecyclerAdapter.notifyItemRangeChanged(0, list.size());
+                            mySwipeRefreshLayout.setRefreshing(false);
+                        }
+                    });
+                }
             }
             //wifiDirect.unRegisterReceiver();
             //wifiDirect = WifiDirect.newInstance(ListActivity.this, onReceiveItemListener);
@@ -120,11 +135,23 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
         mySwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                list.clear();
-                list.addAll(0, DataSupport.order("id desc").limit(10).find(ListItemBean.class));
-                startId = 0;
-                myRecyclerAdapter.notifyItemRangeChanged(0, list.size());
-                mySwipeRefreshLayout.setRefreshing(false);
+                final int id = DataSupport.findLast(BlockChainBean.class).getId();
+                if (id < currentId - 1) {
+                    Toast.makeText(ListActivity.this, "正在更新区块信息", Toast.LENGTH_SHORT).show();
+                    Log.e("请求ID为*之后的区块", String.valueOf(id));
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            client.requestBlockChain(id);
+                        }
+                    }).start();
+                } else {
+                    list.clear();
+                    list.addAll(0, DataSupport.order("id desc").limit(10).find(ListItemBean.class));
+                    startId = 0;
+                    myRecyclerAdapter.notifyItemRangeChanged(0, list.size());
+                    mySwipeRefreshLayout.setRefreshing(false);
+                }
             }
         });
         mySwipeRefreshLayout.setOnLoadMoreListener(new MySwipeRefreshLayout.OnLoadMoreListener() {
@@ -275,7 +302,16 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
         Log.e("onReceiveBlock: ", blockBean.getPrevHash());
         if (DataSupport.where("prevHash = ?", blockBean.getPrevHash()).findFirst(BlockChainBean.class) != null) {
             Log.e("onReceiveBlockChain", "存在了");
+            this.blockBean = null; //接收后将区块置为空，防止区块重新发送
             return;
+        } else {
+            int id = DataSupport.findLast(BlockChainBean.class).getId();
+            if (id < blockBean.getId() - 1) {
+                Log.e("onReceiveBlockChainBean","区块信息不匹配，请先更新区块");
+                currentId = blockBean.getId(); //记录当前主链最新区块id
+                this.blockBean = null; //接收后将区块置为空，防止区块重新发送
+                return;
+            }
         }
         BlockChainBean blockChainBean = new BlockChainBean(blockBean.getTimeStamp(), blockBean.getPrevHash(), blockBean.getHash(), AppUtils.object2Bytes(blockBean));
         blockChainBean.save();

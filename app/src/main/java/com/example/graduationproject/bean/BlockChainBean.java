@@ -10,6 +10,7 @@ import java.io.Serializable;
  */
 
 public class BlockChainBean extends DataSupport implements Serializable {
+    private int id; //数据库里的区块链id编号，区块同步时作为查询索引
     private long timeStamp; //时间戳
     private String prevHash; //前一区块哈希
     private String hash; //本区块哈希
@@ -20,6 +21,14 @@ public class BlockChainBean extends DataSupport implements Serializable {
         this.prevHash = prevHash;
         this.hash = hash;
         this.blockBeanInfo = blockBeanInfo;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public long getTimeStamp() {
