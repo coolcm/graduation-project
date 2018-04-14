@@ -3,6 +3,7 @@ package com.example.graduationproject.component;
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 /**
  * Created by csn on 2018/4/9.
@@ -19,7 +20,7 @@ public class FixBugLinearLayoutManager extends LinearLayoutManager {
         try {
             super.onLayoutChildren(recycler, state);
         } catch (IndexOutOfBoundsException e) {
-            e.printStackTrace();
+            Log.e("IndexOutOfBounds", "Inconsistency detected" );
         }
     }
 }

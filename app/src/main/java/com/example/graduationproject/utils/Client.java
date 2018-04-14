@@ -53,7 +53,12 @@ public class Client {
         this.serverIP = serverIP;
         this.serverPort = serverPort;
         try {
-            datagramSocket = new DatagramSocket(30000);
+            if (datagramSocket == null) { //解决关闭程序后端口没有即时释放的bug
+                Log.e("createClient", "建立udp连接");
+                datagramSocket = new DatagramSocket(null);
+                datagramSocket.setReuseAddress(true);
+                datagramSocket.bind(new InetSocketAddress(30000));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -72,6 +77,7 @@ public class Client {
             datagramPacket.setData(buffer, 0, buffer.length);
             datagramSocket.receive(datagramPacket);
             String message = new String(datagramPacket.getData(), 0, datagramPacket.getLength());
+            Log.e("接收到服务器信息: ", message);
             String str[] = message.split(",");
             clientIP = str[0];
             clientPort = str[1];
@@ -108,6 +114,10 @@ public class Client {
 
     public void sendMessage(byte[] message) {
         Set<String> set = map.keySet();
+        if (set.size() == 0) {
+            onReceiveItemListener.onFailure(); //联网失败
+            return;
+        }
         int i;
         Log.e("sendMessage: ", String.valueOf(set.size()));
         for (String key: set) {
@@ -141,6 +151,10 @@ public class Client {
     //发送区块同步请求信息，请求编号为id之后的所有区块
     public void requestBlockChain(int id) {
         Set<String> set = map.keySet();
+        if (set.size() == 0) {
+            onReceiveItemListener.onFailure(); //联网失败
+            return;
+        }
         for (String key: set) {
             String value = map.get(key);
             Log.e("requestBlockChain", "遍历到" + value + ":" + key);
@@ -212,6 +226,9 @@ public class Client {
                     }
                     Object object = AppUtils.bytes2Object(str.toString().getBytes("ISO-8859-1"));
                     if (object instanceof HashMap) {
+                        if (map.size() == 0) {
+                            onReceiveItemListener.onSuccess(); //联网成功
+                        }
                         map.clear();
                         map.putAll((HashMap<String, String>) object);
                         for (String address: map.keySet()) {

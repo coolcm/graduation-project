@@ -34,24 +34,32 @@
                 android:textSize="18sp"
                 android:textColor="#FF333333"
                 android:gravity="center"
+                android:maxWidth="90dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent" />
 
             <TextView
                 android:text="信用值："
                 android:layout_marginLeft="8dp"
-                android:gravity="center"
+                android:gravity="center_vertical"
+                android:textSize="12sp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent" />
 
             <TextView
                 android:id="@+id/user_credit"
-                android:gravity="center"
+                android:textSize="12sp"
+                android:gravity="center_vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent" />
 
             <TextView
                 android:id="@+id/send_time"
+                android:textSize="12sp"
+                android:textColor="#FF333333"
+                android:maxLines="1"
                 android:gravity="center_vertical|end"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />

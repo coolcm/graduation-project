@@ -6,4 +6,6 @@ package com.example.graduationproject.interfaces;
 
 public interface OnReceiveItemListener {
     void onReceiveItem(Object object);
+    void onSuccess(); //成功获取对等节点时的回调
+    void onFailure(); //获取对等节点失败的回调
 }

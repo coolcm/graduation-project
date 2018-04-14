@@ -22,6 +22,9 @@
         android:textStyle="bold"
         android:textColor="@android:color/black"
         android:layout_marginRight="8dp"
+        android:maxWidth="70dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
@@ -29,12 +32,16 @@
         android:id="@+id/credit_text"
         android:text="信用值："
         android:layout_toRightOf="@id/commentator_name"
+        android:textSize="12sp"
+        android:gravity="center_vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/commentator_credit"
         android:layout_toRightOf="@id/credit_text"
+        android:textSize="12sp"
+        android:gravity="center_vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
@@ -42,8 +49,9 @@
         android:id="@+id/comment_time"
         android:layout_toRightOf="@id/commentator_credit"
         android:textSize="12sp"
-        android:gravity="center|end"
-        android:textColor="#FF555555"
+        android:gravity="center_vertical|end"
+        android:maxLines="1"
+        android:textColor="#FF333333"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

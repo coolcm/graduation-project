@@ -105,6 +105,26 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             //wifiDirect.unRegisterReceiver();
             //wifiDirect = WifiDirect.newInstance(ListActivity.this, onReceiveItemListener);
         }
+
+        @Override
+        public void onSuccess() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(ListActivity.this, "联网成功", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        @Override
+        public void onFailure() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(ListActivity.this, "联网失败，请检查网络设置", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     };
     Client client = Client.getInstance();
 
@@ -125,6 +145,12 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             public void run() {
                 db = LitePal.getDatabase();
                 list.addAll(0, DataSupport.order("id desc").limit(10).find(ListItemBean.class));
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        myRecyclerAdapter.notifyItemRangeChanged(0, list.size());
+                    }
+                });
             }
         }).start();
         myRecyclerAdapter = new MyRecyclerAdapter(list, this); //每项的内容适配器
@@ -308,6 +334,12 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             int id = DataSupport.findLast(BlockChainBean.class).getId();
             if (id < blockBean.getId() - 1) {
                 Log.e("onReceiveBlockChainBean","区块信息不匹配，请先更新区块");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(ListActivity.this, "信息不匹配，请先下拉刷新", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 currentId = blockBean.getId(); //记录当前主链最新区块id
                 this.blockBean = null; //接收后将区块置为空，防止区块重新发送
                 return;
