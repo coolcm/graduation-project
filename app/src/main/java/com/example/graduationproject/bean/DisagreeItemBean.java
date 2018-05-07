@@ -13,12 +13,14 @@ public class DisagreeItemBean extends DataSupport implements Serializable {
     private String userName; //被反对的用户名称
     private int userCredit; //被反对的用户信用
     private String disagreeName; //反对名称
+    private int disagreeCredit; //反对者信用
 
-    public DisagreeItemBean(String resourceHash, String userName, int userCredit, String disagreeName) {
+    public DisagreeItemBean(String resourceHash, String userName, int userCredit, String disagreeName, int disagreeCredit) {
         this.resourceHash = resourceHash;
         this.userName = userName;
         this.userCredit = userCredit;
         this.disagreeName = disagreeName;
+        this.disagreeCredit = disagreeCredit;
     }
 
     public String getResourceHash() {
@@ -51,5 +53,13 @@ public class DisagreeItemBean extends DataSupport implements Serializable {
 
     public void setDisagreeName(String disagreeName) {
         this.disagreeName = disagreeName;
+    }
+
+    public int getDisagreeCredit() {
+        return disagreeCredit;
+    }
+
+    public void setDisagreeCredit(int disagreeCredit) {
+        this.disagreeCredit = disagreeCredit;
     }
 }

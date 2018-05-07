@@ -39,7 +39,7 @@ public class Client {
 
     public static Client getInstance() {
         if (client == null) {
-            client = new Client("10.162.73.244", 1234);
+            client = new Client("59.78.15.78", 1234);
         }
         return client;
     }
@@ -119,7 +119,6 @@ public class Client {
             return;
         }
         int i;
-        Log.e("sendMessage: ", String.valueOf(set.size()));
         for (String key: set) {
             String value = map.get(key);
             System.out.println(key);
@@ -244,7 +243,6 @@ public class Client {
                             break;
                         } else if (message.startsWith("requestBlockChain")) { //处理区块同步请求
                             int id = Integer.parseInt(message.split(":")[1]);
-                            onReceiveItemListener.onReceiveItem(id);
                             List<BlockChainBean> blockChainBeanList = DataSupport.where("id > ?", String.valueOf(id)).find(BlockChainBean.class);
                             InetSocketAddress inetSocketAddress = (InetSocketAddress) datagramPacket.getSocketAddress();;
                             for (BlockChainBean blockChain: blockChainBeanList) {

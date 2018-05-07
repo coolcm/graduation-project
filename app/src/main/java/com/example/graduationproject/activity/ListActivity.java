@@ -64,7 +64,7 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
         public void onReceiveItem(Object object) {
             if (blockBean == null) {
                 BlockChainBean blockChain = DataSupport.findLast(BlockChainBean.class);
-                blockBean = new BlockBean(blockChain.getId(), blockChain.getHash());
+                blockBean = new BlockBean(blockChain.getId() + 1, blockChain.getHash());
             }
             if (object instanceof ListItemBean) {
                 ListItemBean listItem = (ListItemBean) object;
@@ -325,7 +325,7 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
 
     //解析区块信息
     private void onReceiveBlockChainBean(BlockBean blockBean) {
-        Log.e("onReceiveBlock: ", blockBean.getPrevHash());
+        Log.e("onReceiveBlock: " + blockBean.getId(), blockBean.getPrevHash());
         if (DataSupport.where("prevHash = ?", blockBean.getPrevHash()).findFirst(BlockChainBean.class) != null) {
             Log.e("onReceiveBlockChain", "存在了");
             this.blockBean = null; //接收后将区块置为空，防止区块重新发送
@@ -378,13 +378,15 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
         }
         for (AgreeItemBean agreeItem: agreeList) {
             agreeItem.save();
-            UserCreditBean userCredit = DataSupport.where("userName = ?", agreeItem.getUserName()).findFirst(UserCreditBean.class);
-            if (userCredit == null) {
-                userCredit = new UserCreditBean(agreeItem.getUserName(), agreeItem.getUserCredit() + 1);
-            } else {
-                userCredit.setUserCredit(userCredit.getUserCredit() + 1);
+            if (!agreeItem.getUserName().equals(agreeItem.getAgreeName())) {
+                UserCreditBean userCredit = DataSupport.where("userName = ?", agreeItem.getUserName()).findFirst(UserCreditBean.class);
+                if (userCredit == null) {
+                    userCredit = new UserCreditBean(agreeItem.getUserName(), calCredit(agreeItem.getUserCredit(), agreeItem.getAgreeCredit(), true));
+                } else {
+                    userCredit.setUserCredit(calCredit(agreeItem.getUserCredit(), agreeItem.getAgreeCredit(), true));
+                }
+                userCredit.save();
             }
-            userCredit.save();
             ListItemBean listItemBean = DataSupport.where("hash = ?", agreeItem.getResourceHash()).findFirst(ListItemBean.class);
             if (listItemBean != null) {
                 listItemBean.setItemAgree(listItemBean.getItemAgree() + 1);
@@ -393,13 +395,15 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
         }
         for (DisagreeItemBean disagreeItem: disagreeList) {
             disagreeItem.save();
-            UserCreditBean userCredit = DataSupport.where("userName = ?", disagreeItem.getUserName()).findFirst(UserCreditBean.class);
-            if (userCredit == null) {
-                userCredit = new UserCreditBean(disagreeItem.getUserName(), disagreeItem.getUserCredit() - 1);
-            } else {
-                userCredit.setUserCredit(userCredit.getUserCredit() - 1);
+            if (!disagreeItem.getUserName().equals(disagreeItem.getDisagreeName())) {
+                UserCreditBean userCredit = DataSupport.where("userName = ?", disagreeItem.getUserName()).findFirst(UserCreditBean.class);
+                if (userCredit == null) {
+                    userCredit = new UserCreditBean(disagreeItem.getUserName(), calCredit(disagreeItem.getUserCredit(), disagreeItem.getDisagreeCredit(), false));
+                } else {
+                    userCredit.setUserCredit(calCredit(disagreeItem.getUserCredit(), disagreeItem.getDisagreeCredit(), false));
+                }
+                userCredit.save();
             }
-            userCredit.save();
             ListItemBean listItemBean = DataSupport.where("hash = ?", disagreeItem.getResourceHash()).findFirst(ListItemBean.class);
             if (listItemBean != null) {
                 listItemBean.setItemDisagree(listItemBean.getItemDisagree() + 1);
@@ -407,5 +411,30 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             }
         }
         this.blockBean = null; //接收后将区块置为空，防止区块重新发送
+    }
+
+    //根据信用模型计算信用值
+    private int calCredit(int userACredit, int userBCredit, boolean isAgree) {
+        if (isAgree) {
+            return userACredit + calCreditDelta(userACredit, userBCredit);
+        } else {
+            return userACredit - calCreditDelta(userACredit, userBCredit);
+        }
+    }
+
+    private int calCreditDelta(int userACredit, int userBCredit) {
+        double delta;
+        if (userBCredit <= userACredit / 4) {
+            delta = 0;
+        } else if (userBCredit <= userACredit / 2) {
+            delta = userBCredit * 0.001;
+        } else if (userBCredit <= userACredit * 2) {
+            delta = userBCredit * 0.002;
+        } else if (userBCredit <= userACredit * 4) {
+            delta = userBCredit * 0.004;
+        } else {
+            delta = userACredit * 0.016;
+        }
+        return (int) delta;
     }
 }

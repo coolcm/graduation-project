@@ -16,6 +16,8 @@ import com.example.graduationproject.bean.UserInfoBean;
 import com.example.graduationproject.utils.AppUtils;
 import com.example.graduationproject.utils.MyCache;
 
+import java.util.Random;
+
 public class RegisterActivity extends AppCompatActivity { //注册界面
 
     EditText newUserView;
@@ -47,12 +49,12 @@ public class RegisterActivity extends AppCompatActivity { //注册界面
                     UserInfoBean userInfo = new UserInfoBean();
                     userInfo.setUserName(name);
                     userInfo.setUserPassword(password);
-                    userInfo.setCredit(100);
+                    userInfo.setCredit(new Random().nextInt(9000) + 1000);
                     if (MyCache.isCacheExist(RegisterActivity.this, "user")) {
                         Toast.makeText(RegisterActivity.this, "用户注册失败,一个终端只能注册一个账号", Toast.LENGTH_SHORT).show();
                     } else {
                         MyCache.setCache(RegisterActivity.this, "user", userInfo);
-                        new UserCreditBean(name, 100).save();
+                        new UserCreditBean(name, userInfo.getCredit()).save();
                         Toast.makeText(RegisterActivity.this, "用户注册成功", Toast.LENGTH_SHORT).show();
                         finish();
                     }

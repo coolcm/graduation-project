@@ -13,12 +13,14 @@ public class AgreeItemBean extends DataSupport implements Serializable {
     private String userName; //被点赞的用户名称
     private int userCredit; //被点赞的用户信用
     private String agreeName; //点赞者名称
+    private int agreeCredit; //点赞者信用
 
-    public AgreeItemBean(String resourceHash, String userName, int userCredit, String agreeName) {
+    public AgreeItemBean(String resourceHash, String userName, int userCredit, String agreeName, int agreeCredit) {
         this.resourceHash = resourceHash;
         this.userName = userName;
         this.userCredit = userCredit;
         this.agreeName = agreeName;
+        this.agreeCredit = agreeCredit;
     }
 
     public String getResourceHash() {
@@ -51,5 +53,13 @@ public class AgreeItemBean extends DataSupport implements Serializable {
 
     public void setAgreeName(String agreeName) {
         this.agreeName = agreeName;
+    }
+
+    public int getAgreeCredit() {
+        return agreeCredit;
+    }
+
+    public void setAgreeCredit(int agreeCredit) {
+        this.agreeCredit = agreeCredit;
     }
 }

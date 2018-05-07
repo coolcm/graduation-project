@@ -159,7 +159,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
                     agreeView.setText(String.valueOf(Integer.valueOf(agreeView.getText().toString()) + 1));
                     if (userInfo != null) {
                         int credit = DataSupport.where("userName = ?", listItem.getUserName()).findFirst(UserCreditBean.class).getUserCredit();
-                        final AgreeItemBean agreeItem = new AgreeItemBean(listItem.getHash(), listItem.getUserName(), credit, userInfo.getUserName());
+                        final AgreeItemBean agreeItem = new AgreeItemBean(listItem.getHash(), listItem.getUserName(), credit, userInfo.getUserName(), userInfo.getCredit());
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -185,7 +185,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
                     disagreeView.setText(String.valueOf(Integer.valueOf(disagreeView.getText().toString()) + 1));
                     if (userInfo != null) {
                         int credit = DataSupport.where("userName = ?", listItem.getUserName()).findFirst(UserCreditBean.class).getUserCredit();
-                        final DisagreeItemBean disagreeItem = new DisagreeItemBean(listItem.getHash(), listItem.getUserName(), credit, userInfo.getUserName());
+                        final DisagreeItemBean disagreeItem = new DisagreeItemBean(listItem.getHash(), listItem.getUserName(), credit, userInfo.getUserName(), userInfo.getCredit());
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
