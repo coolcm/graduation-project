@@ -98,6 +98,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
         if (listItem != null) {
             textView.setText(listItem.getContent());
             userNameView.setText(listItem.getUserName());
+            userImageView.setImageResource(listItem.getUserPhotoId());
             userCreditView.setText(String.valueOf(DataSupport.where("userName = ?", listItem.getUserName()).findFirst(UserCreditBean.class).getUserCredit()));
             contentTimeView.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA).format(listItem.getSendTime()));
             agreeView.setText(String.valueOf(listItem.getItemAgree()));
@@ -159,7 +160,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
                     agreeView.setText(String.valueOf(Integer.valueOf(agreeView.getText().toString()) + 1));
                     if (userInfo != null) {
                         int credit = DataSupport.where("userName = ?", listItem.getUserName()).findFirst(UserCreditBean.class).getUserCredit();
-                        final AgreeItemBean agreeItem = new AgreeItemBean(listItem.getHash(), listItem.getUserName(), credit, userInfo.getUserName(), userInfo.getCredit());
+                        final AgreeItemBean agreeItem = new AgreeItemBean(listItem.getHash(), listItem.getUserName(), credit, userInfo.getUserName(), userInfo.getHeadPhotoId(), userInfo.getCredit());
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -185,7 +186,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
                     disagreeView.setText(String.valueOf(Integer.valueOf(disagreeView.getText().toString()) + 1));
                     if (userInfo != null) {
                         int credit = DataSupport.where("userName = ?", listItem.getUserName()).findFirst(UserCreditBean.class).getUserCredit();
-                        final DisagreeItemBean disagreeItem = new DisagreeItemBean(listItem.getHash(), listItem.getUserName(), credit, userInfo.getUserName(), userInfo.getCredit());
+                        final DisagreeItemBean disagreeItem = new DisagreeItemBean(listItem.getHash(), listItem.getUserName(), credit, userInfo.getUserName(), userInfo.getHeadPhotoId(), userInfo.getCredit());
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
@@ -217,7 +218,7 @@ public class ContentActivity extends AppCompatActivity implements View.OnClickLi
                 String content = commentEditText.getText().toString();
                 if (userInfo != null) {
                     int credit = DataSupport.where("userName = ?", userInfo.getUserName()).findFirst(UserCreditBean.class).getUserCredit();
-                    final CommentItemBean commentItem = new CommentItemBean(content, userInfo.getUserName(), credit, listItem.getUserName(), listItem.getHash());
+                    final CommentItemBean commentItem = new CommentItemBean(content, userInfo.getUserName(), userInfo.getHeadPhotoId(), credit, listItem.getUserName(), listItem.getHash());
                     new Thread(new Runnable() {
                         @Override
                         public void run() {

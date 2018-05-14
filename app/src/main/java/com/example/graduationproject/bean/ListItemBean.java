@@ -15,6 +15,7 @@ import java.util.Random;
 public class ListItemBean extends DataSupport implements Serializable { //每项文字资源信息
     private String content; //文字内容
     private String userName; //发送者用户名
+    private int userPhotoId; //发送者头像资源ud
     private int userCredit; //发送者信用
     private int itemAgree; //赞同数
     private int itemDisagree; //反对数
@@ -37,9 +38,10 @@ public class ListItemBean extends DataSupport implements Serializable { //每项
         this.hash = AppUtils.getSHA256Str(userName + content + sendTime.getTime());
     }
 
-    public ListItemBean(String content, String userName, int userCredit) { //新建文字资源信息，赞同，反对，评论数一开始均为0
+    public ListItemBean(String content, String userName, int userPhotoId, int userCredit) { //新建文字资源信息，赞同，反对，评论数一开始均为0
         this.content = content;
         this.userName = userName;
+        this.userPhotoId = userPhotoId;
         this.userCredit = userCredit;
         this.itemAgree = 0;
         this.itemDisagree = 0;
@@ -76,6 +78,14 @@ public class ListItemBean extends DataSupport implements Serializable { //每项
 
     public void setUserCredit(int userCredit) {
         this.userCredit = userCredit;
+    }
+
+    public int getUserPhotoId() {
+        return userPhotoId;
+    }
+
+    public void setUserPhotoId(int userPhotoId) {
+        this.userPhotoId = userPhotoId;
     }
 
     public int getItemAgree() {

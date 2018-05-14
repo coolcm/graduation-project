@@ -14,8 +14,8 @@ public class UserInfoBean implements Serializable{ //用户个人信息
 
     private String userName; //登录用户名
     private String userPassword; //登录用户密码
-    private String userId; //用户身份ID
     private int credit; //用户信用指数
+    private int headPhotoId; //头像id
     private List<String> agreeList = new ArrayList<>(); //赞同的资源hash列表
     private List<String> disagreeList = new ArrayList<>(); //反对的资源hash列表
 
@@ -59,11 +59,11 @@ public class UserInfoBean implements Serializable{ //用户个人信息
         this.userPassword = userPassword;
     }
 
-    public String getUserId() {
-        return userId;
+    public int getHeadPhotoId() {
+        return headPhotoId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setHeadPhotoId(int headPhotoId) {
+        this.headPhotoId = headPhotoId;
     }
 }

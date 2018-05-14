@@ -7,7 +7,6 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/commentator_image"
-        android:src="@drawable/profile_photo_boy"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="12dp"

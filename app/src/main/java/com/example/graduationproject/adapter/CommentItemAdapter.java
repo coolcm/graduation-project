@@ -38,6 +38,7 @@ public class CommentItemAdapter extends RecyclerView.Adapter<CommentItemAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.nameView.setText(list.get(position).getCommentatorName());
+        holder.commentatorImage.setImageResource(list.get(position).getCommentatorPhotoId());
         holder.creditView.setText(String.valueOf(DataSupport.where("userName = ?", list.get(position).getCommentatorName()).findFirst(UserCreditBean.class).getUserCredit()));
         holder.contentView.setText(list.get(position).getContent());
         holder.commentTimeView.setText(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA).format(list.get(position).getCommentTime()));

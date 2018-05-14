@@ -12,14 +12,16 @@ import java.util.Date;
 public class CommentItemBean extends DataSupport implements Serializable{ //每条评论相关信息
     private String content; //评论内容
     private String commentatorName; //评论者名称
+    private int commentatorPhotoId; //评论者头像资源ud
     private int commentatorCredit; //评论者信用
     private Date commentTime; //评论时间
     private String userName; //被评论者名称
     private String resourceHash;  //被评论的资源hash
 
-    public CommentItemBean(String content, String commentatorName, int commentatorCredit, String userName, String resourceHash) {
+    public CommentItemBean(String content, String commentatorName, int commentatorPhotoId, int commentatorCredit, String userName, String resourceHash) {
         this.content = content;
         this.commentatorName = commentatorName;
+        this.commentatorPhotoId = commentatorPhotoId;
         this.commentatorCredit = commentatorCredit;
         this.userName = userName;
         this.commentTime = new Date();
@@ -32,6 +34,14 @@ public class CommentItemBean extends DataSupport implements Serializable{ //每�
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public int getCommentatorPhotoId() {
+        return commentatorPhotoId;
+    }
+
+    public void setCommentatorPhotoId(int commentatorPhotoId) {
+        this.commentatorPhotoId = commentatorPhotoId;
     }
 
     public String getCommentatorName() {

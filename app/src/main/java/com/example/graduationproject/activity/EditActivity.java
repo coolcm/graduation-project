@@ -48,7 +48,7 @@ public class EditActivity extends AppCompatActivity { //编辑想发送的内容
                     return;
                 }
                 int credit = DataSupport.where("userName = ?", userInfo.getUserName()).findFirst(UserCreditBean.class).getUserCredit();
-                listItemBean = new ListItemBean(String.valueOf(editText.getText()), userInfo.getUserName(), credit);
+                listItemBean = new ListItemBean(String.valueOf(editText.getText()), userInfo.getUserName(), userInfo.getHeadPhotoId(), credit);
                 Intent intent = new Intent(EditActivity.this, ListActivity.class);
                 intent.putExtra("listItemBean", listItemBean);
                 setResult(1, intent); //返回发送的文字内容信息给上一个activity

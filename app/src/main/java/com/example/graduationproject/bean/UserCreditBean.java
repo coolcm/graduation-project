@@ -12,10 +12,12 @@ public class UserCreditBean extends DataSupport implements Serializable {
 
     private String userName;
     private int userCredit;
+    private int headPhotoId; //头像id
 
-    public UserCreditBean(String userName, int userCredit) {
+    public UserCreditBean(String userName, int userCredit, int headPhotoId) {
         this.userName = userName;
         this.userCredit = userCredit;
+        this.headPhotoId = headPhotoId;
     }
 
     public String getUserName() {
@@ -32,5 +34,13 @@ public class UserCreditBean extends DataSupport implements Serializable {
 
     public void setUserCredit(int userCredit) {
         this.userCredit = userCredit;
+    }
+
+    public int getHeadPhotoId() {
+        return headPhotoId;
+    }
+
+    public void setHeadPhotoId(int headPhotoId) {
+        this.headPhotoId = headPhotoId;
     }
 }

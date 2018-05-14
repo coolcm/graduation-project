@@ -355,7 +355,7 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             listItem.save();
             UserCreditBean userCredit = DataSupport.where("userName = ?", listItem.getUserName()).findFirst(UserCreditBean.class);
             if (userCredit == null) {
-                userCredit = new UserCreditBean(listItem.getUserName(), listItem.getUserCredit());
+                userCredit = new UserCreditBean(listItem.getUserName(), listItem.getUserCredit(), listItem.getUserPhotoId());
             } else {
                 userCredit.setUserCredit(listItem.getUserCredit());
             }
@@ -370,7 +370,7 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             }
             UserCreditBean userCredit = DataSupport.where("userName = ?", commentItem.getCommentatorName()).findFirst(UserCreditBean.class);
             if (userCredit == null) {
-                userCredit = new UserCreditBean(commentItem.getCommentatorName(), commentItem.getCommentatorCredit());
+                userCredit = new UserCreditBean(commentItem.getCommentatorName(), commentItem.getCommentatorCredit(), commentItem.getCommentatorPhotoId());
             } else {
                 userCredit.setUserCredit(commentItem.getCommentatorCredit());
             }
@@ -381,7 +381,7 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             if (!agreeItem.getUserName().equals(agreeItem.getAgreeName())) {
                 UserCreditBean userCredit = DataSupport.where("userName = ?", agreeItem.getUserName()).findFirst(UserCreditBean.class);
                 if (userCredit == null) {
-                    userCredit = new UserCreditBean(agreeItem.getUserName(), calCredit(agreeItem.getUserCredit(), agreeItem.getAgreeCredit(), true));
+                    userCredit = new UserCreditBean(agreeItem.getUserName(), calCredit(agreeItem.getUserCredit(), agreeItem.getAgreeCredit(), true), agreeItem.getAgreePhotoId());
                 } else {
                     userCredit.setUserCredit(calCredit(agreeItem.getUserCredit(), agreeItem.getAgreeCredit(), true));
                 }
@@ -398,7 +398,7 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
             if (!disagreeItem.getUserName().equals(disagreeItem.getDisagreeName())) {
                 UserCreditBean userCredit = DataSupport.where("userName = ?", disagreeItem.getUserName()).findFirst(UserCreditBean.class);
                 if (userCredit == null) {
-                    userCredit = new UserCreditBean(disagreeItem.getUserName(), calCredit(disagreeItem.getUserCredit(), disagreeItem.getDisagreeCredit(), false));
+                    userCredit = new UserCreditBean(disagreeItem.getUserName(), calCredit(disagreeItem.getUserCredit(), disagreeItem.getDisagreeCredit(), false), disagreeItem.getDisagreePhotoId());
                 } else {
                     userCredit.setUserCredit(calCredit(disagreeItem.getUserCredit(), disagreeItem.getDisagreeCredit(), false));
                 }
