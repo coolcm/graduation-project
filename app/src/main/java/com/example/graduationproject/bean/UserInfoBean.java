@@ -10,7 +10,7 @@ import java.util.List;
  * Created by csn on 2018/3/15.
  */
 
-public class UserInfoBean implements Serializable{ //用户个人信息
+public class UserInfoBean implements Serializable { //用户个人信息
 
     private String userName; //登录用户名
     private String userPassword; //登录用户密码
@@ -66,4 +66,5 @@ public class UserInfoBean implements Serializable{ //用户个人信息
     public void setHeadPhotoId(int headPhotoId) {
         this.headPhotoId = headPhotoId;
     }
+
 }

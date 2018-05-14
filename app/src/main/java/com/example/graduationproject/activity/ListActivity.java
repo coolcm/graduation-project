@@ -378,13 +378,17 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
         }
         for (AgreeItemBean agreeItem: agreeList) {
             agreeItem.save();
+            UserCreditBean userCredit = DataSupport.where("userName = ?", agreeItem.getUserName()).findFirst(UserCreditBean.class);
             if (!agreeItem.getUserName().equals(agreeItem.getAgreeName())) {
-                UserCreditBean userCredit = DataSupport.where("userName = ?", agreeItem.getUserName()).findFirst(UserCreditBean.class);
                 if (userCredit == null) {
                     userCredit = new UserCreditBean(agreeItem.getUserName(), calCredit(agreeItem.getUserCredit(), agreeItem.getAgreeCredit(), true), agreeItem.getAgreePhotoId());
                 } else {
                     userCredit.setUserCredit(calCredit(agreeItem.getUserCredit(), agreeItem.getAgreeCredit(), true));
                 }
+                userCredit.save();
+            }
+            if (userCredit.getUserName().equals(userInfo.getUserName())) {
+                userCredit.setAgreeNum(userCredit.getAgreeNum() + 1);
                 userCredit.save();
             }
             ListItemBean listItemBean = DataSupport.where("hash = ?", agreeItem.getResourceHash()).findFirst(ListItemBean.class);
@@ -395,13 +399,17 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
         }
         for (DisagreeItemBean disagreeItem: disagreeList) {
             disagreeItem.save();
+            UserCreditBean userCredit = DataSupport.where("userName = ?", disagreeItem.getUserName()).findFirst(UserCreditBean.class);
             if (!disagreeItem.getUserName().equals(disagreeItem.getDisagreeName())) {
-                UserCreditBean userCredit = DataSupport.where("userName = ?", disagreeItem.getUserName()).findFirst(UserCreditBean.class);
                 if (userCredit == null) {
                     userCredit = new UserCreditBean(disagreeItem.getUserName(), calCredit(disagreeItem.getUserCredit(), disagreeItem.getDisagreeCredit(), false), disagreeItem.getDisagreePhotoId());
                 } else {
                     userCredit.setUserCredit(calCredit(disagreeItem.getUserCredit(), disagreeItem.getDisagreeCredit(), false));
                 }
+                userCredit.save();
+            }
+            if (userCredit.getUserName().equals(userInfo.getUserName())) {
+                userCredit.setDisagreeNum(userCredit.getDisagreeNum() + 1);
                 userCredit.save();
             }
             ListItemBean listItemBean = DataSupport.where("hash = ?", disagreeItem.getResourceHash()).findFirst(ListItemBean.class);

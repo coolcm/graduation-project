@@ -17,6 +17,7 @@
             android:orientation="vertical">
 
             <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/user_photo_view"
                 android:layout_width="125dp"
                 android:layout_height="125dp"
                 android:layout_marginTop="24dp"
@@ -31,8 +32,7 @@
                 android:gravity="center"
                 android:textSize="25sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black"
-                android:text="sjtucsn"/>
+                android:textColor="@android:color/black" />
 
             <LinearLayout
                 android:orientation="horizontal"

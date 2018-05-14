@@ -20,9 +20,14 @@ import android.widget.TextView;
 import com.example.graduationproject.R;
 import com.example.graduationproject.adapter.WifiP2pItemAdapter;
 import com.example.graduationproject.bean.ListItemBean;
+import com.example.graduationproject.bean.UserCreditBean;
+import com.example.graduationproject.bean.UserInfoBean;
 import com.example.graduationproject.broadcast.WifiDirectBroadcastReceiver;
 import com.example.graduationproject.interfaces.OnDeviceClickListener;
 import com.example.graduationproject.utils.AppUtils;
+import com.example.graduationproject.utils.MyCache;
+
+import org.litepal.crud.DataSupport;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,8 +35,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class UserActivity extends AppCompatActivity {  //用户个人信息界面
 
+    private CircleImageView userPhotoView;
+    private TextView userNameView;
     private TextView agreeView;
     private TextView disagreeView;
     private TextView creditView;
@@ -55,13 +64,22 @@ public class UserActivity extends AppCompatActivity {  //用户个人信息界�
         toolbar.setTitle("用户信息");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        userPhotoView = findViewById(R.id.user_photo_view);
+        userNameView = findViewById(R.id.user_info_name);
         agreeView = findViewById(R.id.user_num_of_agree);
         disagreeView = findViewById(R.id.user_num_of_disagree);
         creditView = findViewById(R.id.user_num_of_credit);
         recyclerView = findViewById(R.id.wifi_p2p_recycler_view);
-        agreeView.setText(String.valueOf(new Random().nextInt(100)));
-        disagreeView.setText(String.valueOf(new Random().nextInt(100)));
-        creditView.setText(String.valueOf(new Random().nextInt(100)));
+        UserInfoBean userInfo = (UserInfoBean) MyCache.getCache(this, "user");
+        UserCreditBean userCredit;
+        if (userInfo != null) {
+            userCredit = DataSupport.where("userName = ?", userInfo.getUserName()).findFirst(UserCreditBean.class);
+            userNameView.setText(userInfo.getUserName());
+            userPhotoView.setImageResource(userInfo.getHeadPhotoId());
+            agreeView.setText(String.valueOf(userCredit.getAgreeNum()));
+            disagreeView.setText(String.valueOf(userCredit.getDisagreeNum()));
+            creditView.setText(String.valueOf(userCredit.getUserCredit()));
+        }
 
         /*manager = (WifiP2pManager) getSystemService(WIFI_P2P_SERVICE);
         channel = manager.initialize(this, getMainLooper(), null);
