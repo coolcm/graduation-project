@@ -383,7 +383,7 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
                 if (userCredit == null) {
                     userCredit = new UserCreditBean(agreeItem.getUserName(), calCredit(agreeItem.getUserCredit(), agreeItem.getAgreeCredit(), true), agreeItem.getAgreePhotoId());
                 } else {
-                    userCredit.setUserCredit(calCredit(agreeItem.getUserCredit(), agreeItem.getAgreeCredit(), true));
+                    userCredit.setUserCredit(calCredit(userCredit.getUserCredit(), agreeItem.getAgreeCredit(), true));
                 }
                 userCredit.save();
             }
@@ -404,7 +404,7 @@ public class ListActivity extends AppCompatActivity { //主界面，对每段资
                 if (userCredit == null) {
                     userCredit = new UserCreditBean(disagreeItem.getUserName(), calCredit(disagreeItem.getUserCredit(), disagreeItem.getDisagreeCredit(), false), disagreeItem.getDisagreePhotoId());
                 } else {
-                    userCredit.setUserCredit(calCredit(disagreeItem.getUserCredit(), disagreeItem.getDisagreeCredit(), false));
+                    userCredit.setUserCredit(calCredit(userCredit.getUserCredit(), disagreeItem.getDisagreeCredit(), false));
                 }
                 userCredit.save();
             }
